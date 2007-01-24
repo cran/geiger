@@ -32,22 +32,9 @@ lambdaTree <- function(phy, lambda)
 
 ###DELTA###
 ## checked 11 dec 07; works fine
-deltaTree<-function(phy, delta, rescale=F)
-{
-	tmp<-as.numeric(phy$edge)
-	times<-branching.times(phy)	
-	max(times)->original.rtt.length
-	times=max(times)-times
-	max(times)
-	res<-phy
-	for(i in 1:length(phy$edge.length)) {
-		bl<-phy$edge.length[i]
-		age=times[which(names(times)==phy$edge[i,1])]
-		res$edge.length[i]<-(age+bl)^delta-age^delta
-	}
-	if(rescale==T) res<-rescaleTree(res,original.rtt.length)
-	res
-}
+## Modified Jan 2. 08 by Steve Kembel to work when trees have internal branch labels
+
+deltaTree <- function (phy, delta, rescale = F) {    tmp <- as.numeric(phy$edge)    times <- branching.times(phy)    original.rtt.length <- max(times)    times = max(times) - times    max(times)    tips <- length(phy$tip.label)    res <- phy    for (i in 1:length(phy$edge.length)) {        bl <- phy$edge.length[i]        age = times[phy$edge[i, 1] - tips]        res$edge.length[i] <- (age + bl)^delta - age^delta    }    if (rescale == T)         res <- rescaleTree(res, original.rtt.length)    res}
 
 ###TWORATE#####
 

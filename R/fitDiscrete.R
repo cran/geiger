@@ -14,10 +14,16 @@ function(phy, data, model=c("ER", "SYM", "ARD"), treeTransform=c("none", "lambda
 	}
 	
 	if(!is.ultrametric(phy)) {
-		cat("Warning: some tree transformations in GEIGER might not be sensible for nonultrametric trees.")
+		cat("Warning: some tree transformations in GEIGER might not be sensible for nonultrametric trees.\n")
+		}
+
+	if(hasZeroLengthTips(phy)) {
+		cat("Warning: your tree has some zero-length tip branches. If the desendent species have different trait values, the likelihood will be zero and this approach will not work.\n")
 		}
 
 	td<-treedata(phy, data, data.names, sort=T)
+
+	
 
 	res<-list()
 
@@ -78,6 +84,7 @@ function(phy, data, model=c("ER", "SYM", "ARD"), treeTransform=c("none", "lambda
 			maxQ=log(10000/totalbl)
 			ntries<-20
 			ltry<-numeric(ntries)
+			ltry[]<-NA
 			lsol<-matrix(nrow= ntries, ncol=nRateCats+nep)
 			sp<-numeric(nRateCats)
 			qTries<-exp(-7:2)
@@ -112,13 +119,17 @@ function(phy, data, model=c("ER", "SYM", "ARD"), treeTransform=c("none", "lambda
 			
 			cat("]\n")
 			
-			ltd<-ltry-min(ltry)
-			b<-min(which(ltry==min(ltry)))
+			ok<-!is.na(ltry)
+			
+			if(sum(ok)==0) stop("ERROR: No solution found. Does your tree contain zero-length tip branches?")
+			
+			ltd<-ltry-min(ltry[ok])
+			b<-min(which(ltry==min(ltry[ok])))
 
 			gc<-which(ltd<0.1)
 			us<-lsol[gc,1]
 			usc<-sum((us-min(us))>0.1)			
-			b<-min(which(ltry==min(ltry)))
+			b<-min(which(ltry==min(ltry[ok])))
 			out<-outTries[[b[1]]]	
 			if(usc>1) {out$message="Warning: likelihood surface is flat."}
 			
@@ -377,3 +388,11 @@ function(Q)
 	
 }
 
+hasZeroLengthTips<-function(phy)
+{
+	ntips<-length(phy$tip.label)
+	tips<-phy$edge[,2]<=ntips
+	nn<-phy$edge.length[tips]==0
+	if(sum(nn)>0) return(T)
+	return(F)
+	}
