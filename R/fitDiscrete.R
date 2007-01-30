@@ -47,7 +47,7 @@ function(phy, data, model=c("ER", "SYM", "ARD"), treeTransform=c("none", "lambda
 			f<-function(x) {
 				likelihoodDiscrete(td$phy, td$data[,i], exp(x[-1]), delta=exp(x[1]), model=model)
 				}
-			nep=1; pLow=-10; pHigh=log(1);pStart=0.1;
+			nep=1; pLow=-10; pHigh=log(10);pStart=0.1;
 		}
 		if(treeTransform=="kappa") {
 			f<-function(x) {
@@ -59,13 +59,13 @@ function(phy, data, model=c("ER", "SYM", "ARD"), treeTransform=c("none", "lambda
 			f<-function(x) {
 				likelihoodDiscrete(td$phy, td$data[,i], exp(x[-1]), endRate=exp(x[1]), linear=T, model=model)
 				}
-			nep=1; pLow=-10; pHigh=log(1);pStart=0.1;
+			nep=1; pLow=-10; pHigh=log(10);pStart=0.1;
 		}
 		if(treeTransform=="exponentialChange") {
 			f<-function(x) {
 				likelihoodDiscrete(td$phy, td$data[,i], exp(x[-1]), endRate=exp(x[1]), model=model)
 				}
-			nep=1; pLow=-10; pHigh=log(1);pStart=0.1;
+			nep=1; pLow=-10; pHigh=log(10);pStart=0.1;
 		}
 		if(treeTransform=="twoRate") {
 			f<-function(x) {

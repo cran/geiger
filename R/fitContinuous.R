@@ -93,7 +93,7 @@ function(phy, data, data.names=NULL, model=c("BM", "OU", "lambda", "kappa", "del
     	ds$data=td$data[,i]
     	ds$meserr=meserr[,i]
   		result[[i]]<-fitContinuousModel(ds, print=print)
-  		if(!is.null(colnames(td$data))) names(result)[i]<-colnames(td$data)[i] else names(res)[i]<-paste("Trait", i, sep="")
+  		if(!is.null(colnames(td$data))) names(result)[i]<-colnames(td$data)[i] else names(result)[i]<-paste("Trait", i, sep="")
 
   	}
   	result
