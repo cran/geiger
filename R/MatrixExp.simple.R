@@ -1,4 +1,4 @@
-#This function is required so that the matrix exponentiation never blows up during the likelihood calculation - but it onlt works for  symmetric matrices (ie evenQ matrices)
+#This function is required so that the matrix exponentiation never blows up during the likelihood calculation - but it only works for  symmetric matrices (ie evenQ matrices)
 
 `MatrixExp.simple` <-
 function(Q)

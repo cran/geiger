@@ -1,11 +1,14 @@
 `rate.estimate` <-
-function(time=0, n=0, phy=NULL, epsilon = 0, missing = 0, crown=TRUE, prob=c(0.025, 0.975))
+function(time=0, n=0, phy=NULL, epsilon = 0, missing = 0, crown=TRUE, kendall.moran=FALSE)
 {
 	if(!is.null(phy)) {
 		if (class(phy) != "phylo") 
        		stop("object \"phy\" is not of class \"phylo\"")
        	
-
+		if(kendall.moran)
+		{
+			return(kendallmoran.rate(phy))
+		}
     	time<-max(branching.times(phy))
 		n<-length(phy$tip.label)
 	
@@ -33,6 +36,14 @@ function(time=0, n=0, phy=NULL, epsilon = 0, missing = 0, crown=TRUE, prob=c(0.0
     }
 
    return(rate)
+}
+
+'kendallmoran.rate' <-
+function(phy)
+{
+	s<-sum(phy$edge.length)
+	rate<-(length(phy$tip.label)-2)/s
+	return(rate)
 }
 
 'crown.p' <- 

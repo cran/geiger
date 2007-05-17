@@ -12,7 +12,7 @@
 	a net diversification rate (r), extinction fraction (e), and time interval
 }
 \usage{
-rate.estimate(time=0, n=0, phy=NULL, epsilon = 0, missing = 0, crown=TRUE, prob=c(0.025, 0.975))
+rate.estimate(time=0, n=0, phy=NULL, epsilon = 0, missing = 0, crown=TRUE, kendall.moran=FALSE)
 crown.p(time, r, epsilon, n)
 stem.p(time, r, epsilon, n)
 crown.limits(r, epsilon, time, prob=c(0.025, 0.975))
@@ -26,7 +26,8 @@ stem.limits(r, epsilon, time, prob=c(0.025, 0.975))
   			If you're using a tree then crown is automatically true.}
   \item{epsilon}{ Extinction rate as a fraction of speciation rate }
   \item{missing}{ Number of taxa missing from tree }
-  \item{crown}{ If true, time is treated as crown age; otherwise, stem age }
+  \item{crown}{ If true, time is treated as crown age; otherwise, stem age}
+  \item{kendall.moran}{ If true, calculates Kendall-Moran estimate of speciation rate; requires a complete phylogenetic tree}
   \item{r}{ Net diversification rate, birth - death }
   \item{prob}{ Range of probabilities for calculating confidence region }
 }
