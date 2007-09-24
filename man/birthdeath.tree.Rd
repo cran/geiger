@@ -2,7 +2,7 @@
 \alias{birthdeath.tree}
 \title{Birth-death tree simulator}
 \description{
-	Simulates phylogenetic tree under a uniform birth-death process	
+	Simulates phylogenetic trees under a uniform birth-death process.
 }
 \usage{
 birthdeath.tree(b, d, time.stop = 0, taxa.stop = 0, seed = 0)
@@ -17,15 +17,25 @@ birthdeath.tree(b, d, time.stop = 0, taxa.stop = 0, seed = 0)
               generator is seeded based on the clock}
 }
 \details{
+	Starting from a root node - i.e., two living lineages - this function simulates the growth of a
+	phylogenetic tree under a uniform, time-homogeneous birth-death process.  This means that every
+	lineage has a constant probability of speciating, and a constant probability of going extinct, per
+	unit time.  If birth is greater than death, then the number of lineages is expected to grow exponentially.
+
 }
 \value{
-	Phylogenetic tree in ape format
+	Phylogenetic tree in ape format.  If death rate is non-zero, then the returned tree will likely 
+	include some extinct lineages (terminating before the present day).  The GEIGER function 
+	prune.extinct.taxa can remove these lineages.
 }
 \references{Geiger}
 \author{Luke J. Harmon and Jason Wier}
 \note{ 
+	One note of caution: it is easy to set parameter values that result in tremendously HUGE trees.  If the
+	function seems to hang up, this could be the problem.
 }
 \seealso{
+BDsim for non-phylogenetic simulations; prune.extinct.taxa
 }
 \examples{
 

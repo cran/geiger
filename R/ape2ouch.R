@@ -1,7 +1,9 @@
 `ape2ouch` <-
-function(phy, data)
+function(phy, data, data.names=NULL)
 {
-	phy<-new2old.phylo(phy)
+	td<-treedata(phy, data, data.names)
+	
+	phy<-new2old.phylo(td$phy)
 	n<-length(phy$edge.length)+1
 	node<-1:n
 	species<-character(n)
@@ -17,7 +19,7 @@ function(phy, data)
 	for(i in 2:length(time))
 		time[i]<-time[ancestor[i]]+phy$edge.length[i-1];
 	d<-rep(NA, length(species))
-    d[match(names(data),species)]<-data
+    d[match(rownames(td$data),species)]<-td$data
 
 	obj<-list(d=d, node=node, species=species, ancestor=ancestor, time=time)
 	obj

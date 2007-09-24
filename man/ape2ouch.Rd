@@ -3,15 +3,18 @@
 
 \title{Convert between ape and ouch formats}
 \description{
-  Converts phylogenetic trees between ape format (used by geiger, ape, and laser packages) and 
-  ouch format (used by the ouch package)
+  Converts phylogenetic trees between ape 'phylo' format (used by geiger, ape, and laser packages) and 
+  ouch format (used by the ouch package).  The OUCH package can be used for testing the Ornstein-Uhlenbeck
+  model of evolution, among other things.  If the tree and data file have taxa that don't match, they will
+  be removed from the analysis.
 }
 \usage{
-ape2ouch(phy, data)
+ape2ouch(phy, data, data.names=NULL)
 }
 \arguments{
-  \item{phy}{Phylogenetic tree in ape format}
-  \item{data}{Data vector with names that match tip species}
+  \item{phy}{ An object of class phylo}
+  \item{data}{ Data vector }
+  \item{data.names}{ Tip names for data vector that match tree species; ignored if data includes names}
   
 }
 
@@ -24,19 +27,14 @@ ape2ouch(phy, data)
   \item{time}{Branch times for a phylogenetic tree, ouch format}
   \item{species}{Species names for a phylogenetic tree, ouch format}
 }
-\references{Geiger2}
+\references{ Butler, M.A. and A.A. King, 2004. Phylogenetic comparative analysis: a modeling approach for adaptive evolution. American Naturalist 164:683-695.}
 \author{Luke J. Harmon}
 
 \examples{
 data(geospiza)
 attach(geospiza)
-name.check(geospiza.data, geospiza.tree)->r
-drop.tip(geospiza.tree, r[[1]])->g.tree
 
-data<-geospiza.data[,1]
-names(data)<-rownames(geospiza.data)
-
-ape2ouch(g.tree, data)->geospiza.ouch
+ape2ouch(geospiza.tree, geospiza.data[,1], rownames(geospiza.data))->geospiza.ouch
 
 #Interface with ouch package
 library(ouch)

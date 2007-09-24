@@ -35,19 +35,7 @@ Maintainer: Luke Harmon <harmon@zoology.ubc.ca>
 data(geospiza)
 attach(geospiza)
 
-drop.tip(geospiza.tree, "olivacea")->g.tree
-disp.data<-dtt(g.tree, geospiza.data)
-s<-ic.sigma(g.tree, geospiza.data)
-sims<-sim.char(g.tree, s, 100)
-
-disp.sims<-dtt(g.tree, sims)
-mean.sims<-rowSums(disp.sims)/ncol(disp.sims)
-
-ltt<-sort(branching.times(g.tree), decr=TRUE)
-ltt<-c(0, (max(ltt)-ltt)/max(ltt));
-plot(ltt, disp.data)
-lines(ltt, disp.data)
-lines(ltt, mean.sims)
+dtt.full(geospiza.tree, geospiza.data)
 
 
 # Simulation tester - verifies that simulations produce expected vcv structure
@@ -58,20 +46,13 @@ round(m-m2)
 # Equal to zero because the vcv matrices are as expected.
 
 #Interface with ouch package
-data(geospiza)
-attach(geospiza)
-name.check(geospiza.data, geospiza.tree)->r
-drop.tip(geospiza.tree, r[[1]])->g.tree
-
-data<-geospiza.data[,1]
-names(data)<-rownames(geospiza.data)
-
-ape2ouch(g.tree, data)->geospiza.ouch
+ape2ouch(geospiza.tree, geospiza.data[,1], rownames(geospiza.data))->geospiza.ouch
 
 #Interface with ouch package
 library(ouch)
 
 brown.fit(geospiza.ouch$d, geospiza.ouch$node, geospiza.ouch$ancestor, geospiza.ouch$time)
+
 
 # Reconstruct evolutionary vcv matrix
 v<-cbind(c(4.0, -1.5),c(-1.5, 9.0))

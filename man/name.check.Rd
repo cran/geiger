@@ -2,15 +2,19 @@
 \alias{name.check}
 \title{ Compares taxa in data and tree }
 \description{
-Checks for taxa present in data set but not in tree, and vice-versa
+This function is a general tool for checking for concordance between a data file and a phylogenetic
+tree.  For the data, names can be specified as the names of objects in the vector, rownames of the data 
+array or as 'x.names'. The function finds and lists all taxa present in data set but not in tree, and vice-versa.
 }
 \usage{
-name.check(x, phy)
+name.check(phy, data, data.names=NULL)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{x}{ Data }
-  \item{phy}{ Tree }
+  \item{phy}{ an object of class "phylo" }
+  \item{data}{ data for tips of the tree }
+  \item{data.names} { names of the tips in the order of the data; if this is not given, names 
+  					will be taken from the names or rownames of the object data}
 }
 \details{
 }
@@ -22,6 +26,7 @@ name.check(x, phy)
 \references{  }
 \author{ Luke J. Harmon }
 \note{ 
+
 }
 \seealso{  }
 \examples{
@@ -29,7 +34,7 @@ name.check(x, phy)
 data(geospiza)
 attach(geospiza)
 
-name.check(geospiza.data, geospiza.tree)
+name.check(geospiza.tree, geospiza.data)
 
 }
 

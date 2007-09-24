@@ -1,21 +1,19 @@
 `negloglike` <-
-function(theta, data)
+function(theta, ds)
 {
 	#----------------------------------
 	#-----       PARSE DATA       -----
 	#----------------------------------
-	design 		<- data$design			# Model Secification
-	y			<- data$obs				# TIP data
-	tree		<- data$tree			# Tree
-	spp.name 	<- data$spp.name        # Spp names of TIP data
-	meserr		<- data$meserr
+	y			<- ds$data				# TIP data
+	tree		<- ds$tree			# Tree
+	meserr		<- ds$meserr
 	#----------------------------------
 	#-----  DETERMINE OTHER INFO  -----
 	#----------------------------------
 	n			<- length(y)
-	bounds		<- design$bounds
-	model		<- design$model			
-	if (sum(names(model)==c("lambda", "kappa", "delta", "alpha", "r"))!=5)
+	bounds		<- ds$bounds
+	model		<- ds$model			
+	if (sum(names(model)==c("lambda", "kappa", "delta", "ou", "eb"))!=5)
 		stop("Error with \"model\" internal paramter")
 
 	#----------------------------------
@@ -75,7 +73,7 @@ function(theta, data)
 		delta	<-  inv.logit(theta[3], min=bounds$delta[1], max=bounds$delta[2])
 		means	<- rep(mu,n)
 		mb=max(branching.times(tree))
-		tree<-delta.tree(tree, delta=delta)
+		tree<-deltaTree(tree, delta=delta)
 		vcv<-vcv.phylo(tree)
 
 		rescale <- mb/max(vcv)
@@ -93,7 +91,7 @@ function(theta, data)
 		alpha	<-  inv.logit(theta[3], min=bounds$alpha[1], max=bounds$alpha[2])
 
 		#---- OU TRANSFORMATION
-		tree<-ou.tree(tree, alpha=alpha)
+		tree<-ouTree(tree, alpha=alpha)
 		vcv	<-vcv.phylo(tree)
 		means		    <- rep(mu,n)
 		diag(vcv)=diag(vcv)+meserr^2
@@ -107,11 +105,11 @@ function(theta, data)
 	} else if(model[5]&!(model[1] | model[2] | model[3] | model[4])){
 		mu		<-	theta[1]
 		beta	<-  inv.logit(theta[2], min=bounds$beta[1], max=bounds$beta[2])
-		r	<-  inv.logit(theta[3], min=bounds$r[1], max=bounds$r[2])
+		endRate	<-  inv.logit(theta[3], min=bounds$endRate[1], max=bounds$endRate[2])
 		means		    <- rep(mu,n)
 
 		#---- OU TRANSFORMATION
-		tree<-exponentialchange.tree(tree, r=r)
+		tree<-exponentialchangeTree(tree, endRate)
 		vcv	<-vcv.phylo(tree)
 		diag(vcv)=diag(vcv)+meserr^2
 

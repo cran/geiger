@@ -1,8 +1,32 @@
-`dtt` <-
-function(phy, data, disp="avg.sq")
+`disp.calc` <-
+function(data, disp="avg.sq")
 {
-	phy2<-phy
-	phy<-new2old.phylo(phy)
+	if(disp=="avg.sq") {
+		d<-dist(data, method="euclidean")^2
+		r<-mean(d)
+	}
+	else if(disp=="avg.manhattan") {
+		d<-dist(data, method="manhattan")
+		r<-mean(d)
+	}
+	else if(disp=="num.states") {
+		f<-function(x) length(unique(x))
+		d<-apply(data, 2, f)
+		r<-mean(d)
+	}
+	else r<-0;
+	return(r)
+}
+
+
+
+`dtt` <-
+function(phy, data, data.names=NULL, disp="avg.sq")
+{
+	phy$node.label<-NULL
+	td<-treedata(phy, data, data.names)
+	phy2<-td$phy
+	phy<-new2old.phylo(td$phy)
 	
 	result<-numeric()
 	
@@ -19,8 +43,8 @@ function(phy, data, disp="avg.sq")
 	node.depth<-node.depth/max(ltt);
 	stem.depth<-stem.depth/max(ltt);
 	ltt<-ltt/max(ltt);
-	if(length(dim(data))==2) {
-		d<-tip.disparity(phy2, data, disp);
+	if(length(dim(td$data))==2) {
+		d<-tip.disparity(phy2, td$data, disp=disp);
 		result[1]<-d[1]
 		for(i in 2:length(ltt)) {
 			x<-d[stem.depth>=ltt[i-1]&node.depth<ltt[i-1]]
@@ -32,12 +56,12 @@ function(phy, data, disp="avg.sq")
 			result<-result/result[1];
 			
 	} else {
-		if(length(dim(data))!=3)
+		if(length(dim(td$data))!=3)
 			stop("Error in data");
 		
-		for(i in 1:dim(data)[3]) {
-			pp<-data[,,i]
-			d<-tip.disparity(phy2, pp, disp);
+		for(i in 1:dim(td$data)[3]) {
+			pp<-as.matrix(td$data[,,i])
+			d<-tip.disparity(phy2, pp, disp=disp);
 			y<-numeric()
 	
 			y[1]<-d[1]
@@ -57,4 +81,18 @@ function(phy, data, disp="avg.sq")
 	return(result);	
 }
 
+dtt.full<-function(phy, data, data.names=NULL, disp="avg.sq", nsims=1000, mdi.range=c(0,1))
+{
+	td<-treedata(phy, data, data.names)
+
+	dtt.data<-dtt(td$phy, td$data, disp=disp)
+	ltt<-sort(branching.times(td$phy), decr=TRUE)	ltt<-c(0, (max(ltt)-ltt)/max(ltt));	plot(ltt, dtt.data, type="l", lwd=2, xlab="Relative time", ylab="Disparity");
+	
+	s<-ic.sigma(td$phy, td$data)	sims<-sim.char(td$phy, s, nsims)	dtt.sims<-dtt(td$phy, sims)	mean.sims<-apply(dtt.sims, 1, mean)	lines(ltt, mean.sims, lty=2)
+
+	MDI<-area.between.curves(ltt, apply(dtt.sims, 1, median), dtt.data, mdi.range)
+
+	return(list(dtt.data=dtt.data, dtt.sims=dtt.sims, times=ltt, MDI=MDI))
+	
+}
 

@@ -2,8 +2,8 @@
 \alias{area.between.curves}
 \title{Area between two curves}
 \description{
-	Finds the area between two curves up to a cutoff point
-	(used to calculate the MDI statistic from Harmon et al. 2003
+	Finds the area between two curves (f1 and f2) for a given range on the x-axis.
+	One use for this function is to calculate the MDI statistic from Harmon et al. 2003
 }
 \usage{
 area.between.curves(x, f1, f2, xrange = c(0,1))
@@ -16,13 +16,13 @@ area.between.curves(x, f1, f2, xrange = c(0,1))
   \item{xrange}{Range of x values over which area is calculated}
 }
 \details{
-	Area is calculated between the two curves f1 and f2 for x values between 0 and cutoff
-	If f1 is greater than f2, areas are positive; otherwise, areas are negative
+	Area is calculated between the two curves f1 and f2 for x values in the given range.
+	If f2 is greater than f1, areas are positive; otherwise, areas are negative
 }
 \value{
 	Area between f1 and f2 between 0 and cutoff
 }
-\references{Harmon et al. 2003}
+\references{ Harmon, L. J., J. A. Schulte, J. B. Losos, and A. Larson.  2003.  Tempo and mode of evolutionary radiation in iguanian lizards.  Science 301: 961-964. }
 \author{Luke J. Harmon}
 \note{
 }
@@ -31,22 +31,17 @@ area.between.curves(x, f1, f2, xrange = c(0,1))
 data(geospiza)
 attach(geospiza)
 
-drop.tip(geospiza.tree, "olivacea")->g.tree
+gg<-dtt.full(geospiza.tree, geospiza.data)
 
-disp.data<-dtt(g.tree, geospiza.data)
-s<-ic.sigma(g.tree, geospiza.data)
-sims<-sim.char(g.tree, s, 100)
+# Full area, as in dtt.full function
+area.between.curves(gg$times, apply(gg$dtt.sims,1,mean), gg$dtt.data)
 
-disp.sims<-dtt(g.tree, sims)
-mean.sims<-rowSums(disp.sims)/ncol(disp.sims)
+# Area for first 2/3, as in Harmon et al. 2003
+area.between.curves(gg$times, apply(gg$dtt.sims,1,median), gg$dtt.data, xrange=c(0, 2/3))
 
-ltt<-sort(branching.times(g.tree), decr=TRUE)
-ltt<-c(0, (max(ltt)-ltt)/max(ltt));
-plot(ltt, disp.data)
-lines(ltt, disp.data)
-lines(ltt, mean.sims)
+# You could also use the mean
+area.between.curves(gg$times, apply(gg$dtt.sims,1,mean), gg$dtt.data, xrange=c(0, 2/3))
 
-area.between.curves(ltt, mean.sims, disp.data, xrange=c(0, 2/3))
 }
 
 \keyword{arith}

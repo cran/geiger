@@ -1,5 +1,5 @@
 `rc` <-
-function(phy, plot=T)
+function(phy, make.plot=TRUE, plot.bonf=FALSE, p.cutoff=0.05, cex = par("cex"))
 {
 
 	
@@ -33,7 +33,7 @@ function(phy, plot=T)
 		pp<-numeric(anc)
 		num.anc[i]<-anc
 		for(j in 1:anc) {
-			desc[j]<-length(node.leaves(phy, names(nn)[nn][j]))
+			desc[j]<-length(node.leaves(phy, as.numeric(names(nn)[nn][j])))
 		}
 		max.desc[i]<-max(desc)
 		p[i]<-rcp(max.desc[i], nb.tip, anc)
@@ -42,16 +42,34 @@ function(phy, plot=T)
 	num.anc[1]<-1
 	max.desc[1]<-nb.tip
 	p[1]<-1
-	res<-cbind(num.anc, max.desc, p)
+	bonf.p<-pmin(p*length(ltt),1)
+	res<-cbind(num.anc, max.desc, p, bonf.p)
 	rownames(res)<-c("root", node.name[2:nb.node])
 	
-	if(plot) {
+	if(make.plot) {
 		labels<-character(length(phy$edge.length))
 		names(labels)<-as.character(1:length(labels)+nb.tip)
-		s<-which(res[,3]<0.05)
-		labels[names(s)]<-"*"
+		if(plot.bonf) {
+			s<-which(res[,4]<p.cutoff)
+		} else s<-which(res[,3]<p.cutoff)
+		mark<-character(length(s))
+		if(length(s)>0) {
+		for(i in 1:length(s)) {
+			xx<-names(s)[i]
+			tt<-which(ltt==ltt[xx])
+			nn<-stem.depth>=ltt[tt-1]&node.depth<ltt[tt-1]
+			anc<-sum(nn)
+			desc<-numeric(anc)
+			for(j in 1:anc) {
+				desc[j]<-length(node.leaves(phy, names(nn)[nn][j]))
+			}
+			bigone<-which(desc==max(desc))
+			mark[i]<-names(nn)[nn][bigone]
+		}
+		}
+		labels[mark]<-"*"
 		phy$node.label<-labels
-		plot.phylo(phy, show.node.label=T)
+		plot.phylo(phy, show.node.label=T, cex=cex, no.margin=T)
 	}
 	return(res)
 }

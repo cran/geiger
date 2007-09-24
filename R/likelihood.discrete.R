@@ -1,6 +1,8 @@
 ###Felsenstein's pruning algorithm
-likelihood.discrete<-function(phy, tip.data, q, delta=1, lambda=1, endf=1, break.point=0, f=1, rtt.rescale=0, total.rescale=F)
+likelihood.discrete<-function(phy, tip.data, q, delta=1, lambda=1,  kappa=1, endRate=1, linear=F, breakPoint=0, f=1, rtt.rescale=0, total.rescale=F)
 {
+	
+	if(!is.factor(tip.data)) tip.data<-factor(tip.data)
 	Q<-evenQ(nlevels(tip.data))*q
 	if (class(phy) != "phylo")
 		stop("object \"phy\" is not of class \"phylo\"");
@@ -13,17 +15,24 @@ likelihood.discrete<-function(phy, tip.data, q, delta=1, lambda=1, endf=1, break
 	root <- numeric(nb.states) #makes vector that will store root likelihoods
 	m <- match(phy$tip.label, names(tip.data)) ##identifies elements of tip.data matrix that corresponds with the tip.label
 	if (delta != 1)
-		delta.tree(phy, delta) -> phy;
+		deltaTree(phy, delta) -> phy;
 	if (lambda != 1)
-		lambda.tree(phy, lambda) -> phy;
-	if (endf != 1)
-		linearchange.tree(phy, endf) -> phy;
-	if (break.point != 0)
-		tworate.tree(phy, break.point, f) -> phy;
+		lambdaTree(phy, lambda) -> phy;
+	if (kappa != 1)
+		kappaTree(phy, kappa) -> phy;
+	if (endRate != 1) {
+		if(breakPoint!=0) {
+			tworateTree(phy, breakPoint, endRate) -> phy;
+		} else if(linear==T) {
+			linearchangeTree(phy, endRate) -> phy;
+		} else exponentialchangeTree(phy, endRate)->phy;
+	}
+
+
 	
 	#When comparing deltas across different qs, it might be useful to rescale the total tree length to one	
 	if(rtt.rescale!=0)	
-		rescale.tree(phy, rtt.rescale) -> phy
+		rescaleTree(phy, rtt.rescale) -> phy
 		
 	new2old.phylo(phy)->phy
 	for(i in 1:nrow(phy$edge)) #for each edge

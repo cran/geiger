@@ -1,8 +1,10 @@
 `ic.sigma` <-
-function(phy, matrix)
+function(phy, data, data.names=NULL)
 {
-	f<-function(x) pic(x, phy)
-	ic<-apply(matrix, 2, f)
+	td<-treedata(phy, data, data.names, sort=T)
+	
+	f<-function(x) pic(x, td$phy)
+	ic<-apply(td$data, 2, f)
 	r<-crossprod(ic, ic)/nrow(ic)
 	return(r)
 }

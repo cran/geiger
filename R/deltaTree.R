@@ -3,7 +3,7 @@
 ############################################################
 
 ###LAMBDA###
-lambda.tree <- function(phy, lambda)
+lambdaTree <- function(phy, lambda)
 {
 	original.rtt <- max(branching.times(phy))
 	ltree <- phy
@@ -16,7 +16,7 @@ lambda.tree <- function(phy, lambda)
 }
 
 ###DELTA###
-delta.tree<-function(phy, delta, rescale=F)
+deltaTree<-function(phy, delta, rescale=F)
 {
 	tmp<-as.numeric(phy$edge)
 	times<-branching.times(phy)	
@@ -29,25 +29,25 @@ delta.tree<-function(phy, delta, rescale=F)
 		age=times[which(names(times)==phy$edge[i,1])]
 		res$edge.length[i]<-(age+bl)^delta-age^delta
 	}
-	if(rescale==T) res<-rescale.tree(res,original.rtt.length)
+	if(rescale==T) res<-rescaleTree(res,original.rtt.length)
 	res
 }
 
 ###TWORATE#####
-tworate.tree<-function(phy, breakPoint, f) 
+tworateTree<-function(phy, breakPoint, endRate) 
 {
 	times<-branching.times(phy)	
 	for(i in 1:length(phy$edge.length)) {
 		bl<-phy$edge.length[i]
 		age=times[which(names(times)==phy$edge[i,1])] #gets tip to node length
 		if((age-bl)<breakPoint) #identifies branches that are on the tip side of the break-point (i.e., young)
-			phy$edge.length[i]<-(age-min(age, breakPoint))*1+(min(age, breakPoint)-(age-bl))*f #If an edge is entirely to the right of the breakpoint it is simply multipled by f.  However, if the edge extends across the breakpoint, we want to leave the part to the left of the BP unchanged (this is the first part of this equation, which multiplies this part by 1).  We then want to multiply the part of the edge that is to the right of the BP by f (this is the second part of this line).
+			phy$edge.length[i]<-(age-min(age, breakPoint))*1+(min(age, breakPoint)-(age-bl))*endRate #If an edge is entirely to the right of the breakpoint it is simply multipled by f.  However, if the edge extends across the breakpoint, we want to leave the part to the left of the BP unchanged (this is the first part of this equation, which multiplies this part by 1).  We then want to multiply the part of the edge that is to the right of the BP by f (this is the second part of this line).
 		}
 	phy
 }
 
 ###LINEAR CHANGE###
-linearchange.tree<-function(phy, endf)
+linearchangeTree<-function(phy, endRate)
 {
 	times<-branching.times(phy)
 	names(times)<-(as.numeric(names(times)))
@@ -55,7 +55,7 @@ linearchange.tree<-function(phy, endf)
 		bl<-phy$edge.length[i]
 		age=times[which(names(times)==phy$edge[i,1])]
 		mid=age-bl/2 
-		rate=1+(endf-1)*(1-mid/max(times)) 
+		rate=1+(endRate-1)*(1-mid/max(times)) 
 		phy$edge.length[i]<-phy$edge.length[i]*rate
 	}
 	phy	
@@ -63,18 +63,20 @@ linearchange.tree<-function(phy, endf)
 
 ###RESCALING###
 ##
-rescale.tree<-function(phy, total.length)
+rescaleTree<-function(phy, totalDepth)
 {
 	d<-max(branching.times(phy))
-	phy$edge.length<-(phy$edge.length/d)*total.length
+	phy$edge.length<-(phy$edge.length/d)*totalDepth
 	phy
 }
 
-exponentialchange.tree<-function (phy, r) 
+exponentialchangeTree<-function (phy, endRate) 
 {
 	
-	if(r==0) return(phy)
+	if(endRate==1) return(phy)
     times <- branching.times(phy)
+    d<-max(times)
+    r<-log(endRate)/d
     names(times) <- (as.numeric(names(times)))
     for (i in 1:length(phy$edge.length)) {
         bl <- phy$edge.length[i]
@@ -86,8 +88,31 @@ exponentialchange.tree<-function (phy, r)
     phy
 }
 
-speciational.tree<-function(phy)
+speciationalTree<-function(phy)
 {
 	phy$edge.length[]=1
 	phy	
+}
+
+ouTree<-function(phy, alpha) {
+	times <- branching.times(phy)
+    names(times) <- (as.numeric(names(times)))
+    Tmax<-times[1]
+    phy2<-phy
+    for (i in 1:length(phy$edge.length)) {
+        bl <- phy$edge.length[i]
+        age = times[which(names(times) == phy$edge[i, 1])]
+        t1 = max(times) - age
+        t2 = t1+bl
+        phy2$edge.length[i] = (1/(2*alpha))*exp(-2*alpha * (Tmax-t2)) * (1 - exp(-2 * alpha * t2)) - 
+        						(1/(2*alpha))*exp(-2*alpha * (Tmax-t1)) * (1 - exp(-2 * alpha * t1))
+    }
+    phy2
+	
+}
+
+kappaTree<-function(phy, kappa)
+{
+	phy$edge.length<-phy$edge.length^kappa
+	return(phy)	
 }
