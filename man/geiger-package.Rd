@@ -45,13 +45,8 @@ m2<-vcv.phylo(geospiza.tree)
 round(m-m2)
 # Equal to zero because the vcv matrices are as expected.
 
-#Interface with ouch package
-ape2ouch(geospiza.tree, geospiza.data[,1], rownames(geospiza.data))->geospiza.ouch
-
-#Interface with ouch package
-library(ouch)
-
-brown.fit(geospiza.ouch$d, geospiza.ouch$node, geospiza.ouch$ancestor, geospiza.ouch$time)
+#Test models of evolution
+fit.continuous(geospiza.tree, geospiza.data[,1], rownames(geospiza.data))
 
 
 # Reconstruct evolutionary vcv matrix

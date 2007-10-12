@@ -47,16 +47,42 @@ tworateTree<-function(phy, breakPoint, endRate)
 }
 
 ###LINEAR CHANGE###
-linearchangeTree<-function(phy, endRate)
+linearchangeTree<-function(phy, endRate=NULL, slope=NULL)
 {
+	
+    if(is.null(slope)&&is.null(endRate))
+    	stop("Must supply either endRate or slope")
+    	
 	times<-branching.times(phy)
 	names(times)<-(as.numeric(names(times)))
+	rootdepth=max(times)
+	
+	
+	
+	if(is.null(slope)) {
+		slope=(endRate-1)/rootdepth
+		}
+	
+
+	getrate<-function(begin, end)
+	{
+		br<-1+begin*slope
+		er<-1+end*slope
+		if(br>0 & er>0) return((br+er)/2)
+		if(br<0 & er<0) return(0)
+		ii<- -1/slope
+		return(br*(ii-begin)/(2*(end-begin)))
+	}
+
 	for(i in 1:length(phy$edge.length)) {
 		bl<-phy$edge.length[i]
-		age=times[which(names(times)==phy$edge[i,1])]
-		mid=age-bl/2 
-		rate=1+(endRate-1)*(1-mid/max(times)) 
-		phy$edge.length[i]<-phy$edge.length[i]*rate
+		age=rootdepth-times[which(names(times)==phy$edge[i,1])]
+		end=age+bl
+	
+		phy$edge.length[i]<-phy$edge.length[i]*getrate(age, end)
+
+		
+
 	}
 	phy	
 }
@@ -70,20 +96,25 @@ rescaleTree<-function(phy, totalDepth)
 	phy
 }
 
-exponentialchangeTree<-function (phy, endRate) 
+exponentialchangeTree<-function (phy, endRate=NULL, a=NULL) 
 {
 	
-	if(endRate==1) return(phy)
-    times <- branching.times(phy)
+
+    if(is.null(a)&&is.null(endRate))
+    	stop("Must supply either endRate or a")
+    	
+   	times <- branching.times(phy)
     d<-max(times)
-    r<-log(endRate)/d
+    if(is.null(a))
+ 	   a<-log(endRate)/d
+ 	if(a==0) return(phy)   
     names(times) <- (as.numeric(names(times)))
     for (i in 1:length(phy$edge.length)) {
         bl <- phy$edge.length[i]
         age = times[which(names(times) == phy$edge[i, 1])]
         t1 = max(times) - age
         t2 = t1+bl
-        phy$edge.length[i] = (exp(r*t2)-exp(r*t1))/(r)
+        phy$edge.length[i] = (exp(a*t2)-exp(a*t1))/(a)
     }
     phy
 }

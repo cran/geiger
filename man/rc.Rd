@@ -40,7 +40,7 @@ rc(phy, make.plot=TRUE, plot.bonf=FALSE, p.cutoff=0.05, cex=par("cex"))
   Table of results with four columns: 
   Number of ancestors, Maximum descendents, p-value, Bonferroni-corrected p-value
 }
-\references{ Purvis, A., Nee, S. & Harvey, P. H. (1995) Proc. R. Soc. London Ser. B 260, pp. 329--333 }
+\references{ Purvis, A., Nee, S. & Harvey, P. H. (1995) Proc. R. Soc. London Ser. B 260, pp. 329-333 }
 \author{ Luke J. Harmon }
 \note{ 
 }

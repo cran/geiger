@@ -55,8 +55,8 @@ function(phy, data, data.names=NULL, lambda=FALSE, kappa=FALSE, delta=FALSE, ou=
     #---  SET PARAMETER BOUNDS ---
     #-----------------------------
     #---- DEFAULT BOUNDS
-    bounds.default			 <- matrix(c(0.00001, 20, 0,1, 0.000001, 1, 0.00001, 5, 0, 5, 0.00001, 100), nrow=6, ncol=2, byrow=TRUE)
-    rownames(bounds.default) <- c("beta", "lambda", "kappa", "delta", "alpha", "endRate");
+    bounds.default			 <- matrix(c(0.00001, 20, 0.0000001,1, 0.000001, 1, 0.00001, 5, 0, 5, -10, 10), nrow=6, ncol=2, byrow=TRUE)
+    rownames(bounds.default) <- c("beta", "lambda", "kappa", "delta", "alpha", "a");
     colnames(bounds.default) <- c("min", "max")
 
  	#---- USER DEFINED PARAMETER BOUNDS
@@ -74,9 +74,7 @@ function(phy, data, data.names=NULL, lambda=FALSE, kappa=FALSE, delta=FALSE, ou=
  								  )
  			rownames(bounds.user) <- c("beta", "lambda", "kappa", "delta", "alpha", "endRate")[specified]
    	 		colnames(bounds.user) <- c("min", "max")
-   	 		#----  NOTIFICATION
-   	 		print("Warning: The following user defined parameter bounds have been set:", quote=FALSE)
-   	 		print(bounds.user)
+  
    	 		#----  SET FINAL SEARCH BOUNDS
  			bounds <- bounds.default
  			bounds[specified,] <- bounds.user     # Final Bounds
@@ -94,12 +92,13 @@ function(phy, data, data.names=NULL, lambda=FALSE, kappa=FALSE, delta=FALSE, ou=
     for(i in 1:ncol(td$data)) {
     	ds$data=td$data[,i]
     	ds$meserr=meserr[,i]
-  		result[[i]]<-fit.continuous.model(ds, print=print)
+  		result[[i]]<-fitContinuousModel(ds, print=print)
   	}
   	result
 }
 
-`fit.continuous.model` <-
+
+`fitContinuousModel` <-
 function(ds, print=TRUE)
 {
 	bounds 	<- ds$bounds
@@ -107,58 +106,190 @@ function(ds, print=TRUE)
 	np 		<- sum(model)
 	n 		<- length(ds$data)
 	#--- INITIALIZE RESULTS MATRIX --
-    results <- matrix(nrow=2+np, ncol=4)
-    colnames(results)<- c("Estimates", "SE", "Low.CI", "Upper.CI")
-    rownames(results)<- c("mu", "beta", c("lambda", "kappa", "delta", "alpha", "endRate")[model])
+    results <- numeric(2+np)
+    names(results)<- c("mu", "beta", c("lambda", "kappa", "delta", "alpha", "endRate")[model])
 	#----- MINIMIZE NEGATIVE LOG LIKELIHOOD
-	theta.start <-c(0, 0.1,c(0.5, 0.5, 0.5, 0.5, 0)[model])     # Starting point for profile search
+	
+	beta.start<-var(ds$data)/max(branching.times(ds$tree))
+	theta.start <-c(log(beta.start),c(log(0.5), log(0.5), log(0.5), log(0.1), 0.0001)[model])     # Starting point for profile search
+	lower=log(bounds[1,][c(1, model)==1])
+	upper=log(bounds[2,][c(1, model)==1])
+
 	out         <- NULL
-	out	<- nlm(negloglike, theta.start, hessian=TRUE, ds=ds)
 	
-	model.full <-c(TRUE, model)
-	bounds <- t(bounds)
-	#----------------------------------------
-	#-----  POINT ESTIMATES & VARIANCES -----
-	#----------------------------------------
-	results[1,1]	<- 	out$estimate[1]			   #---   MU - No back transformation
-	i <- 1
-	while (i < sum(model) + 2){
-		i <- i+1
-		results[i,1] <-	inv.logit(out$estimate[i], 
-								min=bounds[which(model.full)[i-1],1], 
-								max=bounds[which(model.full)[i-1],2]
-							)
-	}
-	#----- VARIANCE AND CI, REGULR PARAMETER SPACE
-	par.var			<-	NULL
-	inv.fish.info 	<- solve(out$hessian)     # inverse of fisher info = variance if untransformed
-	fit.var 		<- diag(inv.fish.info)   
-	par.var[1]  	<- fit.var[1]             # variance of mu untransformed
-	i <- 1
-	while (i < sum(model)+2){
-		i <- i+1
-		y <- out$estimate[i]
-		#--- Delta Transformation of error term
-		par.var[i]  <- fit.var[i]*(((exp(y)*(1+exp(y))-exp(2*y))/(1+exp(y))^2) * 
-						(bounds[which(model.full)[i-1],2] - bounds[which(model.full)[i-1],1]))^2
-	}	
-	#-------- CONFIDENCE INTERVALS -----
-	conf.level  <- 0.95
-	crit.val    <- qnorm((1 + conf.level) / 2)
-	for (i in 1:length(out$estimate))
-	{
-		results[i,2]   <- round(sqrt(par.var[i]), digits=4)
-	   	results[i,3:4] <- results[i,1] + c(-1, 1) * crit.val *sqrt(par.var[i])
-	}
-	lnl=-out$minimum
-	k=1+sum(model)
-	return(list(estimates=results, lnl=-out$minimum, aic=2*k-2*lnl)) 
+	y			<- ds$data				# TIP data
+	tree		<- ds$tree			# Tree
+	meserr		<- ds$meserr
+	n			<- length(y)
 	
+	if (sum(names(model)==c("lambda", "kappa", "delta", "ou", "eb"))!=5)
+		stop("Error with \"model\" internal paramter")
+
+
+	#----------------------------------
+	#-----       DEFAULT FIT      -----
+	#----------------------------------
+	if (sum(model)==0) {
+		
+
+		vcv<-vcv.phylo(tree)
+
+		
+		foo<-function(x) {
+			vv<-exp(x)*vcv
+			diag(vv)<-diag(vv)+meserr^2
+			mu<-phylogMean(vv, y)
+			mu<-rep(mu, n)
+			-dmvnorm(y, mu, vv, log=T)
+		}
+		o<-optim(foo, p=theta.start, lower=lower, upper=upper, method="L")
+			
+		results<-list(lnl=-o$value, beta= exp(o$par))
+
+	#----------------------------------
+	#-----       LAMBDA ONLY      -----
+	#----------------------------------
+	} else if (model[1] & !(model[2] | model[3])){
+		
+				
+		
+		foo<-function(x) {
+
+
+			vcv<-vcv.phylo(tree)
+
+			index			<-	matrix(TRUE, n,n)
+			diag(index)		<- FALSE
+			vcv[index] 	<- vcv[index]*exp(x[2])
+			
+			vv<-exp(x[1])*vcv
+
+			
+			diag(vv)<-diag(vv)+meserr^2
+			mu<-phylogMean(vv, y)
+			mu<-rep(mu, n)
+			
+			-dmvnorm(y, mu, vv, log=T)
+		}
+		o<-optim(foo, p=theta.start, lower=lower, upper=upper, method="L")
+			
+		results<-list(lnl=-o$value, beta= exp(o$par[1]), lambda=exp(o$par[2]))
+
+	#----------------------------------
+	#-----        KAPPA ONLY      -----
+	#----------------------------------
+	} else if (model[2] & !(model[1] | model[3])){
+		
+				
+		
+		foo<-function(x) {
+
+			t<-kappaTree(tree, kappa=exp(x[2]))
+			vcv<-vcv.phylo(t)
+
+			
+			vv<-exp(x[1])*vcv
+
+			
+			diag(vv)<-diag(vv)+meserr^2
+			mu<-phylogMean(vv, y)
+			mu<-rep(mu, n)
+			
+			-dmvnorm(y, mu, vv, log=T)
+		}
+		o<-optim(foo, p=theta.start, lower=lower, upper=upper, method="L")
+		
+		results<-list(lnl=-o$value, beta= exp(o$par[1]), lambda=exp(o$par[2]))
+
+
+	#----------------------------------
+	#-----        DELTA ONLY      -----
+	#----------------------------------	
+	} else if (model[3] & !(model[1] | model[2])){
+		
+		foo<-function(x) {
+
+			t<-deltaTree(tree, delta=exp(x[2]))
+			vcv<-vcv.phylo(t)
+
+			
+			vv<-exp(x[1])*vcv
+
+			
+			diag(vv)<-diag(vv)+meserr^2
+			mu<-phylogMean(vv, y)
+			mu<-rep(mu, n)
+			
+			-dmvnorm(y, mu, vv, log=T)
+		}
+		o<-optim(foo, p=theta.start, lower=lower, upper=upper, method="L")
+		
+		results<-list(lnl=-o$value, beta= exp(o$par[1]), delta=exp(o$par[2]))	#----------------------------------
+	#-----        ALPHA ONLY      -----
+	#----------------------------------			
+	} else if (model[4] & !(model[1] | model[2] | model[3])){
+		
+		
+		
+		foo<-function(x) {
+			t<-ouTree(tree, exp(x[2]))
+
+			vcv<-vcv.phylo(t)
+			
+			vv<-exp(x[1])*vcv
+			diag(vv)<-diag(vv)+meserr^2
+			
+			mu<-phylogMean(vv, y)
+			mu<-rep(mu, n)
+			
+			-dmvnorm(y, mu, vv, log=T)
+		}
+		o<-optim(foo, p=theta.start, lower=lower, upper=upper, method="L")
+			
+		results<-list(lnl=-o$value, beta= exp(o$par[1]), alpha=exp(o$par[2]))
+
+
+	#----------------------------------
+	#-----        EXPON ONLY      -----
+	#----------------------------------	
+	} else if(model[5]&!(model[1] | model[2] | model[3] | model[4])){
+
+		
+		foo<-function(x) {
+			t<-exponentialchangeTree(tree, a=x[2])
+
+			vcv<-vcv.phylo(t)
+			
+			vv<-exp(x[1])*vcv
+			diag(vv)<-diag(vv)+meserr^2
+			
+			mu<-phylogMean(vv, y)
+			mu<-rep(mu, n)
+			
+			-dmvnorm(y, mu, vv, log=T)
+		}
+		o<-optim(foo, p=theta.start, lower=lower, upper=upper, method="L")
+			
+		results<-list(lnl=-o$value, beta= exp(o$par[1]), a=o$par[2])	}else{
+		stop("Parameters  \"lambda, \"kappa\" and \"delta\" can only be fit one at a time currently")
+	}
+	
+	k=np+1
+	results$aic<-2*k-2*results$lnl
+	results$aicc<-2*k*(n-1)/(n-k-2)-2*results$lnl
+
+	return(results) 
+
 }
 
-inv.logit<-function (x, min = 0, max = 1) 
+phylogMean<-function(phyvcv, data) 
 {
-    p <- exp(x)/(1 + exp(x))
-    p <- ifelse(is.na(p) & !is.na(x), 1, p)
-    p * (max - min) + min
-}
+	o<-rep(1, length(data))
+	ci<-solve(phyvcv)
+	
+	m1<-solve(t(o) %*% ci %*% o)
+	m2<-t(o) %*% ci %*% data
+	
+	return(m1 %*% m2)
+	
+	}

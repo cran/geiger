@@ -18,8 +18,8 @@ lambdaTree(phy, lambda)
 kappaTree(phy, kappa)
 ouTree(phy, alpha)
 tworateTree(phy, breakPoint, endRate) 
-linearchangeTree(phy, endRate)
-exponentialchangeTree(phy, endRate)
+linearchangeTree(phy, endRate=NULL, slope=NULL)
+exponentialchangeTree(phy, endRate=NULL, a=NULL)
 speciationalTree(phy)
 rescaleTree(phy, totalDepth)
 }
@@ -32,6 +32,8 @@ rescaleTree(phy, totalDepth)
   \item{alpha}{Value of Ornstein-Uhlenbeck constraint parameter}
   \item{breakPoint}{Applies a new rate of evolution after the time specified as the breakpoint}
   \item{endRate}{Rate of change at the present day, relative to the initial (root) rate}
+  \item{slope}{Slope of the relationship between rate and time in the linearchange model}
+  \item{a}{Exponent of the relationship between rate and time in the exponentialchange model}
   \item{totalDepth}{Desired value for root to tip distance of the tree.} 
 }
 \details{
@@ -63,14 +65,17 @@ rescaleTree(phy, totalDepth)
 						if endrate is less than 1, branches towards the tips are made shorter. If endRate = 1, the model is a constant-
 						rate Brownian motion model (so the tree is returned unchanged).}
 	\item{linearchangeTree}{A transformation that changes the rate of evolution linearly through time.
-						The rate at the present day is supplied as endRate, and only needs to be specified as a ratio relative to the initial rate
-						at the root of the tree.  Rates change linearly: r(t) = ro + a * t, where ro is the inital rate and a is the slope determined using endRate. 
-						If endRate is greater than 1, evolution gradually speeds up; if endrate is less than 1, evolution gradually slows down. If endRate = 1, the model is a constant-
+						The rate at the present day is supplied either as endRate, a ratio relative to the initial rate
+						at the root of the tree, or as the slope of the relationship between rate and time.  Rates change linearly: 
+						r(t) = ro + slope * t, where ro is the inital rate and a is the slope determined using endRate. 
+						If endRate is greater than 1 or slope > 0, evolution gradually speeds up; if endrate is less than 1 or slope < 0, 
+						evolution gradually slows down. If endRate = 1, the model is a constant-
 						rate Brownian motion model (so the tree is returned unchanged).}
 	\item{exponentialchangeTree}{A transformation that changes the rate of evolution exponentially through time.
-						The rate at the present day is supplied as endRate, in exactly the same way as in linearchangeTree.
+						The rate at the present day is supplied as endRate or a, in exactly the same way as in linearchangeTree.
 						The difference for this function is that rates grow or decay exponentially rather than linearly.
-						The equation is r(t) = ro * exp(a * t), where ro is the inital rate and a is determined using endRate.}
+						The equation is r(t) = ro * exp(a * t), where ro is the inital rate and a either given or is determined using endRate.
+						One of the two (a or endRate) must be specified, or the function returns an error.}
 	\item{speciationalTree}{Transforms all the branch lengths in the tree to a length of one; sometimes this is called a 'speciational' or
 						'punctuated' model of evolution.}
 	\item{rescaleTree}{Rescales a tree so that the total depth of the tree (i.e. the distance from the root to the tips) equals 

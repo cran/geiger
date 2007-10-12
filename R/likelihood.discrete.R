@@ -1,5 +1,5 @@
 ###Felsenstein's pruning algorithm
-likelihood.discrete<-function(phy, tip.data, q, delta=1, lambda=1,  kappa=1, endRate=1, linear=F, breakPoint=0, f=1, rtt.rescale=0, total.rescale=F)
+likelihood.discrete<-function(phy, tip.data, q, delta=1, lambda=1,  kappa=1, endRate=1, linear=F, breakPoint=0, f=1, rtt.rescale=0, total.rescale=F, returnFull=F)
 {
 	
 	if(!is.factor(tip.data)) tip.data<-factor(tip.data)
@@ -45,6 +45,9 @@ likelihood.discrete<-function(phy, tip.data, q, delta=1, lambda=1,  kappa=1, end
 			phy$edge.length <- phy$edge.length/total.tree
 		}
 	while(1) {
+		
+		if(sum(as.numeric(phy$edge[,2])>0)==2) break 
+	
 		#obtain ancestors of current tips
 		x <- match(phy$edge[,1], phy$edge[,2])[as.numeric(phy$edge[,2])>0] #finds nodes connected to terminal taxa
 		#find last node with two tip descendent
@@ -58,11 +61,13 @@ likelihood.discrete<-function(phy, tip.data, q, delta=1, lambda=1,  kappa=1, end
 		phy$edge[a,2]<-1
 		phy$edge[t,2]<-0
 
-		#if this is the root you're done
-		if(a==1) break
+	
 	}
 	t <- which(as.numeric(phy$edge[,2])>0)
 	bl <- phy$edge.length[t]
 	root <- frag.like(l[t,], bl, Q)
-	return(-log(sum(root/nb.states)))
+	neglnl=-log(sum(root/nb.states))
+	if(returnFull==F) {
+		return(neglnl)
+	} else return(list(neglnl=neglnl, root=root, l=l))
 }
