@@ -1,4 +1,4 @@
-export(area.between.curves, birthdeath.tree, phy.anova, phy.manova)
+export(ape2ouch, area.between.curves, birthdeath.tree, phy.anova, phy.manova)
 export(deltaTree, lambdaTree, kappaTree, tworateTree, linearchangeTree, rescaleTree)
 export(exponentialchangeTree, speciationalTree, ouTree)
 export(disp.calc, dtt, dtt.full, ic.sigma)

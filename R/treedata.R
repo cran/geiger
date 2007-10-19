@@ -24,15 +24,16 @@ treedata<-function(phy, data, data.names=NULL, sort=F)
 				data.names<-rownames(data)
 	}
 	nc<-name.check(phy, data, data.names)
-	if(nc[[1]][1]!="OK") {
+	if(is.na(nc[[1]][1]) | nc[[1]][1]!="OK") {
 		if(length(nc[[1]]!=0))
 			phy=drop.tip(phy, nc[[1]])
+	
 		if(length(nc[[2]]!=0)) {
 			m<-match(data.names, nc[[2]])
-			data=data[!is.na(m),]
+			data=as.matrix(data[is.na(m),])
+			data.names<-data.names[is.na(m)]
 			}
-		}
-
+ 	}
 	order<-match(data.names, phy$tip.label)	
 
 	rownames(data)<-phy$tip.label[order]
@@ -42,6 +43,8 @@ treedata<-function(phy, data, data.names=NULL, sort=F)
     	index <- match(phy$tip.label, rownames(data))
    		data <- as.matrix(data[index,])
 	}
+	
+	phy$node.label=NULL
 	
 	return(list(phy=phy, data=data))
 }

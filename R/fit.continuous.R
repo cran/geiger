@@ -55,7 +55,7 @@ function(phy, data, data.names=NULL, lambda=FALSE, kappa=FALSE, delta=FALSE, ou=
     #---  SET PARAMETER BOUNDS ---
     #-----------------------------
     #---- DEFAULT BOUNDS
-    bounds.default			 <- matrix(c(0.00001, 20, 0.0000001,1, 0.000001, 1, 0.00001, 5, 0, 5, -10, 10), nrow=6, ncol=2, byrow=TRUE)
+    bounds.default			 <- matrix(c(0.00000001, 20, 0.0000001,1, 0.000001, 1, 0.00001, 5, 0.0000001, 50, -3, 0), nrow=6, ncol=2, byrow=TRUE)
     rownames(bounds.default) <- c("beta", "lambda", "kappa", "delta", "alpha", "a");
     colnames(bounds.default) <- c("min", "max")
 
@@ -84,6 +84,7 @@ function(phy, data, data.names=NULL, lambda=FALSE, kappa=FALSE, delta=FALSE, ou=
     #---   APPEND MODEL SETTINGS  ---
     #--------------------------------
   	ds$bounds <- data.frame(t(bounds))
+
   	ds$model  <- model
   	#--------------------------------
     #---        FIT MODEL         ---
@@ -112,8 +113,9 @@ function(ds, print=TRUE)
 	
 	beta.start<-var(ds$data)/max(branching.times(ds$tree))
 	theta.start <-c(log(beta.start),c(log(0.5), log(0.5), log(0.5), log(0.1), 0.0001)[model])     # Starting point for profile search
-	lower=log(bounds[1,][c(1, model)==1])
-	upper=log(bounds[2,][c(1, model)==1])
+	
+	lower=bounds[1,][c(1, model)==1]
+	upper=bounds[2,][c(1, model)==1]
 
 	out         <- NULL
 	
@@ -131,6 +133,8 @@ function(ds, print=TRUE)
 	#----------------------------------
 	if (sum(model)==0) {
 		
+		lower=log(lower)
+		upper=log(upper)
 
 		vcv<-vcv.phylo(tree)
 
@@ -151,7 +155,8 @@ function(ds, print=TRUE)
 	#----------------------------------
 	} else if (model[1] & !(model[2] | model[3])){
 		
-				
+		lower=log(lower)
+		upper=log(upper)		
 		
 		foo<-function(x) {
 
@@ -180,6 +185,8 @@ function(ds, print=TRUE)
 	#----------------------------------
 	} else if (model[2] & !(model[1] | model[3])){
 		
+		lower=log(lower)
+		upper=log(upper)
 				
 		
 		foo<-function(x) {
@@ -206,7 +213,8 @@ function(ds, print=TRUE)
 	#-----        DELTA ONLY      -----
 	#----------------------------------	
 	} else if (model[3] & !(model[1] | model[2])){
-		
+		lower=log(lower)
+		upper=log(upper)
 		foo<-function(x) {
 
 			t<-deltaTree(tree, delta=exp(x[2]))
@@ -224,12 +232,15 @@ function(ds, print=TRUE)
 		}
 		o<-optim(foo, p=theta.start, lower=lower, upper=upper, method="L")
 		
-		results<-list(lnl=-o$value, beta= exp(o$par[1]), delta=exp(o$par[2]))	#----------------------------------
+		results<-list(lnl=-o$value, beta= exp(o$par[1]), delta=exp(o$par[2]))	
+		
+	#----------------------------------
 	#-----        ALPHA ONLY      -----
 	#----------------------------------			
 	} else if (model[4] & !(model[1] | model[2] | model[3])){
 		
-		
+		lower=log(lower)
+		upper=log(upper)
 		
 		foo<-function(x) {
 			t<-ouTree(tree, exp(x[2]))
@@ -254,7 +265,8 @@ function(ds, print=TRUE)
 	#----------------------------------	
 	} else if(model[5]&!(model[1] | model[2] | model[3] | model[4])){
 
-		
+		lower[1]=log(lower[1])
+		upper[1]=log(upper[1])
 		foo<-function(x) {
 			t<-exponentialchangeTree(tree, a=x[2])
 
@@ -281,6 +293,8 @@ function(ds, print=TRUE)
 	return(results) 
 
 }
+
+
 
 phylogMean<-function(phyvcv, data) 
 {
