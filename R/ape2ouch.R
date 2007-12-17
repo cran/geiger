@@ -1,6 +1,8 @@
 `ape2ouch` <-
 function(phy, data, data.names=NULL)
 {
+	phy<-read.tree(text=write.tree(phy))
+	
 	td<-treedata(phy, data, data.names)
 	
 	phy<-new2old.phylo(td$phy)

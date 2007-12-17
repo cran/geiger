@@ -1,10 +1,13 @@
 \name{name.check}
 \alias{name.check}
+\alias{treedata}
 \title{ Compares taxa in data and tree }
 \description{
 This function is a general tool for checking for concordance between a data file and a phylogenetic
 tree.  For the data, names can be specified as the names of objects in the vector, rownames of the data 
-array or as 'x.names'. The function finds and lists all taxa present in data set but not in tree, and vice-versa.
+array or as 'data.names'. The name.check function finds and lists all taxa present in data set but not 
+in the tree, and vice-versa.  The treedata function returns a list containing both the tree and the data 
+after pruning out any species that are not found in both. }
 }
 \usage{
 name.check(phy, data, data.names=NULL)

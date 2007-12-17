@@ -7,6 +7,8 @@ function(time=0, n=0, phy=NULL, epsilon = 0, missing = 0, crown=TRUE, kendall.mo
        	
 		if(kendall.moran)
 		{
+			if(missing != 0)
+				cat("WARNING: current implementation of Kendall-Moran estimate does not account for missing taxa\n")
 			return(kendallmoran.rate(phy))
 		}
     	time<-max(branching.times(phy))

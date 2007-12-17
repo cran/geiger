@@ -1,15 +1,16 @@
 `birthdeath.tree` <-
-function (b, d, time.stop=0, taxa.stop=0, seed=0){
+function (b, d, time.stop=0, taxa.stop=0, seed=0, print.seed=FALSE, return.all.extinct=TRUE){
 
 # December 6 2005 Jason T. Weir
 # Modified by Luke J. Harmon
 # The following simulates Yule trees to a given time T
 
-if(seed==0) seed=set.seed.clock();
-
+if(seed==0) seed=set.seed.clock(print=print.seed);
 
 if(time.stop==0 & taxa.stop==0)
 	stop("Must have stopping criterion\n");
+	
+while(1) {
 
 edge <- rbind(c(1, 2), c(1, 3)) # this is a starting edge matrix
 edge.length <- rep(NA, 2)
@@ -52,10 +53,10 @@ repeat{
 		    edge.length[alive][random_lineage]<-t-stem.depth[alive][random_lineage];
           	    alive[alive][random_lineage]<-FALSE
             }###4
-
-
       }#1A
-
+      
+if(return.all.extinct==T | sum(alive)>1) break;
+}
 edge.length[alive]<-t-stem.depth[alive]
 n<--1;
 for(i in 1:max(edge)) {
@@ -63,8 +64,9 @@ for(i in 1:max(edge)) {
 		edge[which(edge[,1]==i), 1]<-n
 		edge[which(edge[,2]==i), 2]<-n
 		n<-n-1
+		}
 	}
-}
+
 	
 	edge[edge>0]<-1:sum(edge>0)
 
@@ -74,6 +76,19 @@ for(i in 1:max(edge)) {
     	obj <- list(edge = edge, edge.length = edge.length, tip.label=tip.label)
     	class(obj) <- "phylo"
     	obj<-old2new.phylo(obj)
+    	
     obj
 }
+
+`set.seed.clock` <-
+function(print=F){
+	date = date()
+ 	seed1 = as.numeric(strsplit(substring(date,12,19),":")[[1]])%*%c(1,100,10000)
+ 	seed <- runif(1, min=0, max=50) * seed1
+ 	set.seed(seed)
+ 	if(print) cat("Seed = ", seed, "\n");
+ 	seed[1,1]
+}
+
+
 

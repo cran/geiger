@@ -20,7 +20,7 @@ License: \tab GPL version 2 or greater?\cr
 
 }
 \author{
-Luke J. Harmon, Jason Wier, Chad Brock, and Wendell Challenger
+Luke J. Harmon, Jason Weir, Chad Brock, and Wendell Challenger
 
 Maintainer: Luke Harmon <harmon@zoology.ubc.ca>
 }
@@ -46,7 +46,7 @@ round(m-m2)
 # Equal to zero because the vcv matrices are as expected.
 
 #Test models of evolution
-fit.continuous(geospiza.tree, geospiza.data[,1], rownames(geospiza.data))
+fitContinuous(geospiza.tree, geospiza.data)
 
 
 # Reconstruct evolutionary vcv matrix

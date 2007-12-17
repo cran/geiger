@@ -1,21 +1,37 @@
 ############################################################
 ###############TREE TRANSFORMATIONS#########################
 ############################################################
+## a few functions modified 11 dec 07 to accommodate ultrametric trees; see comments below
 
 ###LAMBDA###
+## modified 11 dec 07
 lambdaTree <- function(phy, lambda)
 {
-	original.rtt <- max(branching.times(phy))
+	originalDiag = diag(vcv.phylo(phy)) ## added to fix the final edge length problem in non-ultrametric tree
+	original.rtt <- max(diag(vcv.phylo(phy))) ## generalizes to a non-ultrametric tree
+	  ## following line assumes ultrametricity
+	  ## original.rtt <- max(branching.times(phy))
 	ltree <- phy
 	ltree.old <- new2old.phylo(phy) #needed due to change in ape tree format
 	ltree$edge.length <- ltree$edge.length * lambda #shortens internal branches in proportion to lambda
-	t <- original.rtt * (1-lambda) #needed to rescale tree back to its original root-to-tip length
+	  ## The following assignment of terminal branch fails when the tree is non-ultrametric
+	  ## t <- original.rtt * (1-lambda) #needed to rescale tree back to its original root-to-tip length
 	which(ltree.old$edge[,2] > 0) -> terminal.edges #identifies termal edges to be extended for recovery of original rtt length; based on old tree format in which nodes are coded as negative values
-	ltree$edge.length[terminal.edges] + t -> ltree$edge.length[terminal.edges] #extends terminal edges
+	terminalEdgesOrdered <- match(match(labels(originalDiag), ltree$tip.label, nomatch = F), ltree$edge[,2])
+	ltree$edge.length[terminalEdgesOrdered] <- 
+	ltree$edge.length[terminalEdgesOrdered] + (originalDiag - (originalDiag * lambda)) ## generalizes to a non-ultrametric tree
+	  ## The following didn't work on a non-ultrametric tree
+	  ## ltree$edge.length[terminal.edges] + t -> ltree$edge.length[terminal.edges] -- extends terminal edges
+	estMinLambda <- 
+	  ((min(phy$edge.length[terminalEdgesOrdered]) 
+	  + originalDiag[phy$edge[,2][match(min(phy$edge.length[terminalEdgesOrdered]), phy$edge.length)]]) 
+	  / originalDiag[phy$edge[,2][match(min(phy$edge.length[terminalEdgesOrdered]), phy$edge.length)]] )
+	if(any(ltree$edge.length < 0)) message("Lambda values too large imply negative terminal branch lengths. \nLambda should not exceed an estimated ", round(estMinLambda, 3), " on this tree.")
 	return(ltree)
 }
 
 ###DELTA###
+## checked 11 dec 07; works fine
 deltaTree<-function(phy, delta, rescale=F)
 {
 	tmp<-as.numeric(phy$edge)
@@ -34,6 +50,7 @@ deltaTree<-function(phy, delta, rescale=F)
 }
 
 ###TWORATE#####
+
 tworateTree<-function(phy, breakPoint, endRate) 
 {
 	times<-branching.times(phy)	
@@ -88,10 +105,13 @@ linearchangeTree<-function(phy, endRate=NULL, slope=NULL)
 }
 
 ###RESCALING###
-##
+## modified 11 dec 07
 rescaleTree<-function(phy, totalDepth)
 {
-	d<-max(branching.times(phy))
+	## following line added to accommodate ultrametric trees
+	d <- max(diag(vcv.phylo(phy)))
+	  ## assumes ultrametricity
+	  ## d<-max(branching.times(phy))
 	phy$edge.length<-(phy$edge.length/d)*totalDepth
 	phy
 }
