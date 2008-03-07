@@ -8,9 +8,7 @@ function(phy, data, data.names=NULL)
 		else
 			data.names<-rownames(data)
 	}
-
-	t<-phy$tip.label;
-
+	t<-phy$tip.label
 	r1<-t[is.na(match(t,data.names))]
 	r2<-data.names[is.na(match(data.names,t))]
 	

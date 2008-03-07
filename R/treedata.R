@@ -15,6 +15,7 @@ treedata<-function(phy, data, data.names=NULL, sort=F)
 
 	if(is.vector(data)) data<-as.matrix(data)
 	if(is.factor(data)) data<-as.matrix(data)
+	if(is.array(data) & length(dim(data))==1) data<-as.matrix(data)
 
 	if(is.null(data.names)) {
 		if(is.null(rownames(data))) {

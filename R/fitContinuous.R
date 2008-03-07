@@ -1,5 +1,5 @@
 `fitContinuous` <-
-function(phy, data, data.names=NULL, model=c("BM", "OU", "lambda", "kappa", "delta", "EB"), bounds=NULL,  meserr=NULL)
+function(phy, data, data.names=NULL, model=c("BM", "OU", "lambda", "kappa", "delta", "EB", "white", "trend"), bounds=NULL,  meserr=NULL)
 {
 	
 	# sort is T because sub-functions assume data are in
@@ -54,8 +54,8 @@ function(phy, data, data.names=NULL, model=c("BM", "OU", "lambda", "kappa", "del
     #---  SET PARAMETER BOUNDS ---
     #-----------------------------
     #---- DEFAULT BOUNDS
-    bounds.default			 <- matrix(c(0.00000001, 20, 0.0000001,1, 0.000001, 1, 0.00001, 2.999999, 0.0000001, 50, -3, 0), nrow=6, ncol=2, byrow=TRUE)
-    rownames(bounds.default) <- c("beta", "lambda", "kappa", "delta", "alpha", "a");
+    bounds.default			 <- matrix(c(0.00000001, 20, 0.0000001,1, 0.000001, 1, 0.00001, 2.999999, 0.0000001, 50, -3, 0, 0.0000000001, 100, -100, 100), nrow=8, ncol=2, byrow=TRUE)
+    rownames(bounds.default) <- c("beta", "lambda", "kappa", "delta", "alpha", "a", "nv", "mu");
     colnames(bounds.default) <- c("min", "max")
 
  	#---- USER DEFINED PARAMETER BOUNDS
@@ -66,12 +66,13 @@ function(phy, data, data.names=NULL, model=c("BM", "OU", "lambda", "kappa", "del
  			stop("Please specify user defined parameter bounds as a list()")
  		}else{
  			specified   <- !c(is.null(bounds$beta), is.null(bounds$lambda), 
- 							  is.null(bounds$kappa), is.null(bounds$delta),  is.null(bounds$alpha), is.null(bounds$a)
+ 							  is.null(bounds$kappa), is.null(bounds$delta),  is.null(bounds$alpha), is.null(bounds$a),
+ 							  is.null(bounds$nv), is.null(bounds$mu)
  							  )
- 			bounds.user <- matrix(c(bounds$beta, bounds$lambda, bounds$kappa, bounds$delta, bounds$alpha, bounds$a), 
+ 			bounds.user <- matrix(c(bounds$beta, bounds$lambda, bounds$kappa, bounds$delta, bounds$alpha, bounds$a, bounds$nv, bounds$mu), 
  								  nrow=sum(specified), ncol=2, byrow=TRUE
  								  )
- 			rownames(bounds.user) <- c("beta", "lambda", "kappa", "delta", "alpha", "a")[specified]
+ 			rownames(bounds.user) <- c("beta", "lambda", "kappa", "delta", "alpha", "a",  "nv", "mu")[specified]
    	 		colnames(bounds.user) <- c("min", "max")
   
    	 		#----  SET FINAL SEARCH BOUNDS
@@ -235,7 +236,69 @@ function(ds, print=TRUE)
 		o<-optim(foo, p=start, lower=lower, upper=upper, method="L")
 		
 		results<-list(lnl=-o$value, beta= exp(o$par[1]), delta=exp(o$par[2]))	
+	#----------------------------------
+	#-----        WHITE NOISE     -----
+	#----------------------------------	
+	} else if (model=="white"){
 		
+		k<-2
+		start=c(mean(y), log(var(y)))
+		lower=c(-Inf, log(bounds[1,"nv"]))
+		upper=c(Inf, log(bounds[2, "nv"]))
+		
+		lnl.noise<- function (p, x, se)
+		# p is the vector of parameters, tree is not needed
+		# x and se are trait means and std errors
+		{
+  			## prep parameters
+  			root<- p[1]	# trait value of root of tree (also optimum)
+  			vs<- exp(p[2])		# white noise variance 
+  			n<- length(x)
+  			VV<- diag(vs, nrow=n)	
+  			diag(VV)<- diag(VV) + se^2	# add sampling variance to diagonal
+    
+  			## logl
+  			M<- rep(root,n)
+  			-dmvnorm(x, M, VV, log=TRUE)
+		}
+		
+		o<- optim(start, fn=lnl.noise, x=y, se=meserr, lower=lower, upper=upper, method="L")
+		
+		results<-list(lnl=-o$value, mean= o$par[1], nv=exp(o$par[2]))	
+	#----------------------------------
+	#-----        TREND           -----
+	#----------------------------------	
+	} else if (model=="trend"){
+		
+		k<-3
+		vcv<- vcv.phylo(tree)
+  		ww<- lm(y ~ diag(vcv))
+  		p0<- c(phylogMean(vcv, y), var(y)/max(branching.times(tree)), coef(ww)[2])
+
+		lower=c(-Inf, log(bounds[1,"beta"]), bounds[1,"mu"])
+		upper=c(Inf, log(bounds[2,"beta"]), bounds[2,"mu"])
+		
+
+		lnl.BMtrend<- function(p, vcv, x, se)
+		# p is vector of parameters, tr is tree
+		# x and se are vectors of trait means and standard errors
+		{
+  			## prep parameters
+  			root<- p[1]	# trait value of root of tree
+  			vs<- exp(p[2])		# BM variance 
+  			ms<- p[3]		# BM trend
+  			VV<- vs*vcv	
+  			diag(VV)<- diag(VV) + se^2	# add sampling variance to diagonal
+  			n<- length(x)
+  
+ 			## logl
+  			M<- root+ ms*diag(vcv)
+  			- dmvnorm(x, M, VV, log=TRUE)
+  		}
+
+		o<- optim(p0, fn=lnl.BMtrend, vcv=vcv, x=y, se=meserr, lower=lower, upper=upper, method="L")
+		names(o$par)<-NULL
+		results<-list(lnl=-o$value, mean= o$par[1], beta=exp(o$par[2]), mu=o$par[3])		
 	#----------------------------------
 	#-----        ALPHA ONLY      -----
 	#----------------------------------			
@@ -341,7 +404,7 @@ function(ds, print=TRUE)
 	} else if(model=="EB"){
 
 		k<-3
-		start=log(c(beta.start, 0.01))
+		start=c(log(beta.start), 0.01)
 		lower=c(log(bounds[1,"beta"]),bounds[1,"a"])
 		upper=c(log(bounds[2,"beta"]),bounds[2,"a"])
 		

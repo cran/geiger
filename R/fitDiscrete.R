@@ -72,7 +72,7 @@ function(phy, data, model=c("ER", "SYM", "ARD"), treeTransform=c("none", "lambda
 				likelihoodDiscrete(td$phy, td$data[,i], exp(x[-(1:2)]), breakPoint=x[1], endRate=exp(x[2]), model=model)
 				}
 			mv<-max(branching.times(td$phy))	
-			nep=2; pLow=0; pHigh=mv;pStart=c(0.1, 0.1);
+			nep=2; pLow=c(mv/1000, -10); pHigh=c(mv, 10);pStart=c(0.1, 0.1);
 		}
 				
 						
@@ -89,8 +89,13 @@ function(phy, data, model=c("ER", "SYM", "ARD"), treeTransform=c("none", "lambda
 			sp<-numeric(nRateCats)
 			qTries<-exp(-7:2)
 			
-			lower=c(rep(pLow, nep), rep(minQ, nRateCats))
-			upper=c(rep(pHigh, nep), rep(maxQ, nRateCats))
+			if(nep==0) {
+				lower=rep(minQ, nRateCats)
+				upper=rep(maxQ, nRateCats)
+			} else {
+				lower=c(pLow, rep(minQ, nRateCats))
+				upper=c(pHigh, rep(maxQ, nRateCats))
+			}
 			
 			cat("Finding the maximum likelihood solution\n")
 			cat("[0        50      100]\n")

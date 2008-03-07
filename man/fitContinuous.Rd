@@ -5,7 +5,7 @@
 	Fits macroevolutionary models to phylogenetic trees
 }
 \usage{
-fitContinuous(phy, data, data.names=NULL, model=c("BM", "OU", "lambda", "kappa", "delta", "EB"), bounds=NULL,  meserr=NULL)
+fitContinuous(phy, data, data.names=NULL, model=c("BM", "OU", "lambda", "kappa", "delta", "EB", "white", "trend"), bounds=NULL,  meserr=NULL)
 }
 \arguments{
   \item{phy}{ object of type phylo }
@@ -37,6 +37,9 @@ Bounds for the parameters in the likelihood search are sometimes necessary. This
 cause the search to get "stuck."  This is particularly common, in my experience, for the OU model.  You can set bounds with the "bounds" parameter.  For example, 
 to set bounds on alpha, use bounds=list(alpha=c(0.0001, 10)).  One can also set multiple bounds at once: bounds=list(alpha=c(0.0001, 10), beta=c(1, 100)). 
 This function might work better than in previous versions of Geiger. 
+ \item{model="white"}{ White noise model; all species drawn from the same normal distribution (no phylogenetic signal).}
+ \item{model="trend"}{ Brownian motion with a trend.}
+
 }
 \value{
 	Returns a matrix of parameter estimates, along with approximate standard errors and 95% confidence intervals. 

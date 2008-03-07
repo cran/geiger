@@ -13,7 +13,7 @@
 	Apply various transformation to the branches of a phylogenetic tree.
 	}
 \usage{
-deltaTree(phy, delta, rescale = F)
+deltaTree(phy, delta, rescale = T)
 lambdaTree(phy, lambda)
 kappaTree(phy, kappa)
 ouTree(phy, alpha)
@@ -26,7 +26,7 @@ rescaleTree(phy, totalDepth)
 \arguments{
   \item{phy}{ an object of class phylo }
   \item{delta}{Delta value}
-  \item{rescale}{if TRUE, rescale tree to a total depth (root-to-tip distance) of one before applying transformation}
+  \item{rescale}{if TRUE, rescale tree so that the total depth (root-to-tip distance) remains constant; this facilitates comparisons of rates among different delta parameter values}
   \item{lambda}{Lambda value}
   \item{kappa}{ Kappa value }
   \item{alpha}{Value of Ornstein-Uhlenbeck constraint parameter}
