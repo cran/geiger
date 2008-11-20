@@ -14,7 +14,7 @@ phy.anova<-function(phy, data, group, data.names=NULL, nsim=1000)
 	print(a)
 
 	cat("\n\nPhylogenetic p-value: \t")
-	cat((sum(f.data>f.null)+1)/(nsim+1))
+	cat((sum(f.null>f.data)+1)/(nsim+1))
 
 		
 }

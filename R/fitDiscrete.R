@@ -81,7 +81,7 @@ function(phy, data, model=c("ER", "SYM", "ARD"), treeTransform=c("none", "lambda
 			outTries<-list()
 			totalbl<-sum(td$phy$edge.length)
 			minQ=log(0.01/totalbl)
-			maxQ=log(10000/totalbl)
+			maxQ=log(1000/totalbl)
 			ntries<-20
 			ltry<-numeric(ntries)
 			ltry[]<-NA
@@ -102,7 +102,7 @@ function(phy, data, model=c("ER", "SYM", "ARD"), treeTransform=c("none", "lambda
 			cat("[")
 			
 			for(j in 1:10) {
-				sp<-c(pStart, rep(qTries[i], nRateCats))
+				sp<-c(pStart, log(rep(qTries[j], nRateCats)))
 				te<-try(outTries[[j]]<-optim(f, par=sp, method="L",  lower=lower, upper=upper), silent=T)
 				if(class(te)!="try-error") {
 					ltry[j]<-outTries[[j]]$value
@@ -208,6 +208,7 @@ function(phy, data, model=c("ER", "SYM", "ARD"), treeTransform=c("none", "lambda
 
 
 ###Felsenstein's pruning algorithm
+### Modified June 13 2008 to work on log-likelihoods instead of likelihoods
 likelihoodDiscrete<-function(phy, tip.data, q, model="ER", delta=1, lambda=1,  kappa=1, endRate=1, linear=F, breakPoint=0, f=1, rtt.rescale=0, total.rescale=F, returnFull=F)
 {
 	
@@ -220,7 +221,7 @@ likelihoodDiscrete<-function(phy, tip.data, q, model="ER", delta=1, lambda=1,  k
 	nb.tip <- max(tmp) #number of tips
 	nb.node <- -min(tmp) #number of internal nodes
 	nb.states <- nlevels(tip.data) #numbers of states in character
-	l <- matrix(0, nrow=nrow(phy$edge), ncol=nb.states) #makes matrix that will store likelihoods of each character state at each node
+	l <- matrix(-Inf, nrow=nrow(phy$edge), ncol=nb.states) #makes matrix that will store likelihoods of each character state at each node
 	root <- numeric(nb.states) #makes vector that will store root likelihoods
 	m <- match(phy$tip.label, names(tip.data)) ##identifies elements of tip.data matrix that corresponds with the tip.label
 	if (delta != 1)
@@ -244,8 +245,13 @@ likelihoodDiscrete<-function(phy, tip.data, q, model="ER", delta=1, lambda=1,  k
 		rescaleTree(phy, rtt.rescale) -> phy
 		
 	new2old.phylo(phy)->phy
+	
 	for(i in 1:nrow(phy$edge)) #for each edge
-		if(as.numeric(phy$edge[i,2])>0) l[i,tip.data[m[as.numeric(phy$edge[i,2])]]] <- 1.0 #if the edge is connected to a terminal taxon, you set the likelihood of the tip value equal to 1 and all others equal to zero.
+		if(as.numeric(phy$edge[i,2])>0) {
+
+			l[i,tip.data[m[as.numeric(phy$edge[i,2])]]] <- 0 
+		}
+			#if the edge is connected to a terminal taxon, you set the likelihood of the tip value equal to 1 and all others equal to zero.
 		times <- branching.times(old2new.phylo(phy)) #get node to tip distances
 		-1*(1:(max(as.numeric(names(times)))-min(as.numeric(names(times)))+1))->names(times)
 		times = max(times) - times #convert into root to node tips
@@ -265,7 +271,6 @@ likelihoodDiscrete<-function(phy, tip.data, q, model="ER", delta=1, lambda=1,  k
 		bl <- phy$edge.length[t]
 		age = times[which(names(times)==phy$edge[a,2])]
 		l[a,] <- frag.like(l[t,], bl, Q)
-
 		#next line effectively prunes out the tips just used
 		phy$edge[a,2]<-1
 		phy$edge[t,2]<-0
@@ -275,7 +280,7 @@ likelihoodDiscrete<-function(phy, tip.data, q, model="ER", delta=1, lambda=1,  k
 	t <- which(as.numeric(phy$edge[,2])>0)
 	bl <- phy$edge.length[t]
 	root <- frag.like(l[t,], bl, Q)
-	neglnl=-log(sum(root/nb.states))
+	neglnl=-logspace_sum(root)+log(nb.states)
 	if(returnFull==F) {
 		return(neglnl)
 	} else return(list(neglnl=neglnl, root=root, l=l))
@@ -348,7 +353,7 @@ function(tip.like, bl, q)
 
 	nb.states<-ncol(tip.like)
 
-	r<-rep(1, nb.states)
+	r<-rep(0, nb.states)
 
 	d<-length(bl)
 
@@ -362,7 +367,7 @@ function(tip.like, bl, q)
 
 		for(j in 1:d) 
 
-			r[i]<-r[i]*sum(p[[j]][i,]*tip.like[j,])
+			r[i]<-r[i]+logspace_sum(log(p[[j]][i,])+tip.like[j,])
 
 	return(r)
 
@@ -401,3 +406,15 @@ hasZeroLengthTips<-function(phy)
 	if(sum(nn)>0) return(T)
 	return(F)
 	}
+	
+
+logspace_add<-function(logx, logy) {
+	if(logx==-Inf) return(logy) else max(logx, logy) + log1p(exp (-abs (logx - logy)));
+}
+
+logspace_sum<-function(logx) {
+      r<-logx[1]
+      for(i in 2:length(logx))
+      	r<-logspace_add(r, logx[i])
+      r	
+}
