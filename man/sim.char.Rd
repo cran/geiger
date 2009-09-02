@@ -34,9 +34,6 @@ sim.char(phy, model.matrix, nsims = 1, model = "brownian", root.state = 1)
 }
 \references{ }
 \author{ Luke J, Harmon }
-\note{ 
-}
-\seealso{  }
 \examples{
 data(geospiza)
 attach(geospiza) 

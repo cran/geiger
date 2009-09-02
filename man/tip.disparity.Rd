@@ -20,9 +20,6 @@ tip.disparity(phy, data, data.names=NULL, disp = "avg.sq")
 }
 \references{ Harmon et al. 2003 }
 \author{ Luke J. Harmon }
-\note{ 
-}
-\seealso{ }
 \examples{
 
 data(geospiza)

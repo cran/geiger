@@ -14,13 +14,5 @@ Phylogenetic tree and morphological data for Darwin's finches
 
 \source{Dolph Schluter}
 
-\note{ 
-}
-\seealso{
-}
-\examples{
 
-
-
-}
 \keyword{datasets}

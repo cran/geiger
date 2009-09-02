@@ -1,6 +1,7 @@
 `node.leaves` <-
 function(phy, node)
 {
+	node<-as.numeric(node)
 	n<-length(phy$tip.label);
 	if(node <= n) return(phy$tip.label[as.numeric(node)])
 

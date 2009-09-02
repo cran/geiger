@@ -38,9 +38,6 @@ literature; for more details see the summary.manova help page.
 \references{Garland Jr., T., A. W. Dickerman, C. M. Janis, and J. A. Jones. 1993. Phylogenetic analysis of covariance 
 by computer simulation. Syst. Biol. 42(3):265-292.}
 \author{ Luke J. Harmon }
-\note{ 
-
-}
 \seealso{ anova, summary.manova, ic.sigma }
 \examples{
 

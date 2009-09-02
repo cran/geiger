@@ -25,8 +25,6 @@ BDsim(nStart, b, d, times)
 \references{Yule, G. U. 1924. A mathematical theory of evolution based on the conclusions of 
 			Dr. J. C. Willis, FRS. Philos. Trans. R. Soc. London Ser. B 213: 21-87 }
 \author{Richard E. Glor and Luke J. Harmon}
-\note{ 
-}
 \seealso{
 rate.estimate, stem.p, crown.p, stem.limits, crown.limits
 }

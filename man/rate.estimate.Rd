@@ -44,9 +44,6 @@ stem.limits(r, epsilon, time, prob=c(0.025, 0.975))
 }
 \references{ Magallon, S. and M. J. Sanderson. 2000. Absolute diversification rates in angiosperm clades. Evolution 55:1762-1780.}
 \author{ Luke J. Harmon and Chad Brock }
-\note{ 
-}
-\seealso{  }
 \examples{
 
 

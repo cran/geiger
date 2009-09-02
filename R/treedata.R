@@ -28,7 +28,7 @@ treedata<-function(phy, data, data.names=NULL, sort=F, warnings=T)
 	nc<-name.check(phy, data, data.names)
 	if(is.na(nc[[1]][1]) | nc[[1]][1]!="OK") {
 		if(length(nc[[1]]!=0)) {
-			phy=drop.tip(phy, nc[[1]])
+			phy=drop.tip(phy, as.character(nc[[1]]))
 			if(warnings) {
 				cat("Dropped tips from the tree because there were no matching names in the data:\n")
 				print(nc[[1]])

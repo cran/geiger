@@ -26,10 +26,6 @@ Data for this function should be a matrix of continuously-valued variables.
              approach to determining the importance of constraint on phenotypic evolution in the 
              neotropical lizard, Anolis cristatellus. Evolutionary Ecology Research 9: 261-282. }
 \author{ Luke J. Harmon }
-\note{ 
-
-}
-\seealso{  }
 \examples{
 
 data(geospiza)

@@ -274,7 +274,11 @@ function(ds, print=TRUE)
 		vcv<- vcv.phylo(tree)
   		ww<- lm(y ~ diag(vcv))
   		p0<- c(phylogMean(vcv, y), var(y)/max(branching.times(tree)), coef(ww)[2])
-
+		if(is.na(p0[3])) {
+			p0[3]<-0
+			if(is.ultrametric(tree))
+				cat("WARNING: Cannot estimate a trend with an ultrametric tree; lnl will be the same as the BM model")
+		}
 		lower=c(-Inf, log(bounds[1,"beta"]), bounds[1,"mu"])
 		upper=c(Inf, log(bounds[2,"beta"]), bounds[2,"mu"])
 		

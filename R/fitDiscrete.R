@@ -104,6 +104,7 @@ function(phy, data, model=c("ER", "SYM", "ARD"), treeTransform=c("none", "lambda
 			for(j in 1:10) {
 				sp<-c(pStart, log(rep(qTries[j], nRateCats)))
 				te<-try(outTries[[j]]<-optim(f, par=sp, method="L",  lower=lower, upper=upper), silent=T)
+				
 				if(class(te)!="try-error") {
 					ltry[j]<-outTries[[j]]$value
 					lsol[j,]<-exp(outTries[[j]]$par)
@@ -414,7 +415,8 @@ logspace_add<-function(logx, logy) {
 
 logspace_sum<-function(logx) {
       r<-logx[1]
-      for(i in 2:length(logx))
-      	r<-logspace_add(r, logx[i])
+      if(length(logx)>1)
+      	for(i in 2:length(logx))
+      		r<-logspace_add(r, logx[i])
       r	
 }

@@ -25,10 +25,6 @@ prune.random.taxa(phy, n)
 }
 \references{ }
 \author{ Luke J. Harmon }
-\note{ 
-
-}
-\seealso{  }
 \examples{
 
 # Birth-death tree with extinct taxa

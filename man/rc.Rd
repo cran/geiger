@@ -45,9 +45,6 @@ Moore, B.R., K.M.A. Chan, and M.J. Donoghue. 2004. Detecting diversification rat
 Supertrees: Combining Information to Reveal the Tree of Life, pp. 487-533. Kluwer Academic, Dordrecht, the Netherlands.
 }
 \author{ Luke J. Harmon }
-\note{ 
-}
-\seealso{  }
 \examples{
 
 data(geospiza)

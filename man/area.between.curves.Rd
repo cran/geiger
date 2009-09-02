@@ -24,8 +24,6 @@ area.between.curves(x, f1, f2, xrange = c(0,1))
 }
 \references{ Harmon, L. J., J. A. Schulte, J. B. Losos, and A. Larson.  2003.  Tempo and mode of evolutionary radiation in iguanian lizards.  Science 301: 961-964. }
 \author{Luke J. Harmon}
-\note{
-}
 \examples{
 
 data(geospiza)

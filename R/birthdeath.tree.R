@@ -76,7 +76,7 @@ for(i in 1:max(edge)) {
     	obj <- list(edge = edge, edge.length = edge.length, tip.label=tip.label)
     	class(obj) <- "phylo"
     	obj<-old2new.phylo(obj)
-    	
+    	obj<-read.tree(text=write.tree(obj))	
     obj
 }
 

@@ -22,12 +22,7 @@ License: \tab GPL version 2 or greater?\cr
 \author{
 Luke J. Harmon, Jason Weir, Chad Brock, and Wendell Challenger
 
-Maintainer: Luke Harmon <harmon@zoology.ubc.ca>
-}
-\references{
-}
-\seealso{
-
+Maintainer: Luke Harmon <lukeh@uidaho.edu>
 }
 \examples{
 

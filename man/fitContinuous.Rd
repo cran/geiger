@@ -22,23 +22,23 @@ returns parameter estimates, (approximate) confidence intervals based on the Hes
 function, and the likelihood.  Likelihood is maximized using the r function nlm.  This is a purely univariate function at this point - if multivariate data 
 are sent to the function, it will carry out calculations for each character independently.  Possible models are
 as follows:
- \item{ model="BM" }{ Brownian motion }
- \item{ model="OU" }{ Ornstein-Uhlenbeck; fits a model of random walk with a central tendency proportional to the parameter alpha.
+ model="BM": Brownian motion 
+ model="OU": Ornstein-Uhlenbeck; fits a model of random walk with a central tendency proportional to the parameter alpha.
  							Also called the "hansen" model in ouch, although the way the parameters are fit 
- 							is slightly different here.}
- \item{model="lambda"}{ Pagel's lambda; multiplies all internal branches of the tree by lambda, leaving tip branches as their original length.}
- \item{model="kappa"}{Pagel's kappa; raises all branch lengths to the power kappa.  As kappa approaches zero, the model becomes speciational.}
- \item{model="delta"}{Pagel's delta; raises all node depths to the power delta. If delta is less than one, evolution in concentrated early in the tree; delta > 1 concentrates evolution towards the tips.}
+ 							is slightly different here.
+ model="lambda": Pagel's lambda; multiplies all internal branches of the tree by lambda, leaving tip branches as their original length.
+ model="kappa": Pagel's kappa; raises all branch lengths to the power kappa.  As kappa approaches zero, the model becomes speciational.
+ model="delta": Pagel's delta; raises all node depths to the power delta. If delta is less than one, evolution in concentrated early in the tree; delta > 1 concentrates evolution towards the tips.
 
- \item{model="EB" }{ Early burst, also called the ACDC model. Set by the eb parameter; fits a model where the rate of evolution increases or decreases exponentially through time, under the model
+ model="EB": Early burst, also called the ACDC model. Set by the eb parameter; fits a model where the rate of evolution increases or decreases exponentially through time, under the model
  					r(t) = ro * exp(r * t), where ro is the inital rate and r is the rate change parameter.  The actual parameter estimated, endRate, 
- 					is the proportion of the initial rate represented by the end rate.}
+ 					is the proportion of the initial rate represented by the end rate.
 Bounds for the parameters in the likelihood search are sometimes necessary. This is because in some cases, the likelihood surface can have long flat ridges that 
 cause the search to get "stuck."  This is particularly common, in my experience, for the OU model.  You can set bounds with the "bounds" parameter.  For example, 
 to set bounds on alpha, use bounds=list(alpha=c(0.0001, 10)).  One can also set multiple bounds at once: bounds=list(alpha=c(0.0001, 10), beta=c(1, 100)). 
 This function might work better than in previous versions of Geiger. 
- \item{model="white"}{ White noise model; all species drawn from the same normal distribution (no phylogenetic signal).}
- \item{model="trend"}{ Brownian motion with a trend.}
+model="white": White noise model; all species drawn from the same normal distribution (no phylogenetic signal).
+model="trend": Brownian motion with a trend.
 
 }
 \value{
@@ -48,11 +48,7 @@ This function might work better than in previous versions of Geiger.
 \references{Lambda, kappa, and delta: Pagel, M. 1999. Inferring the historical patterns of biological evolution. Nature 401:877-884.
 			OU: Butler, M.A. and A.A. King, 2004. Phylogenetic comparative analysis: a modeling approach for adaptive evolution. American Naturalist 164:683-695.
 			Early burst: Paper in revision., L. J. Harmon et al. }
-\author{ Wendell Challenger and Luke J. Harmon}
-\note{ 
-
-}
-\seealso{  }
+\author{Luke J. Harmon and Wendell Challenger}
 \examples{
 
 data(geospiza)
