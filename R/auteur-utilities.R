@@ -105,9 +105,9 @@ load=function(x, ...){
 	} else {
 		dots=list(...)
 		if("envir"%in%names(dots)){
-			return(base:::load(x, envir=dots$envir))
+			return(base::load(x, envir=dots$envir))
 		} else {
-			return(base:::load(x, envir=parent.frame()))
+			return(base::load(x, envir=parent.frame()))
 		}
 	}
 }

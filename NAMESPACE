@@ -1,3 +1,5 @@
+import(ape, MASS, mvtnorm, msm, subplex, deSolve,
+        colorspace, digest, Rcpp, coda, ncbit)
 useDynLib(geiger)
 export(aov.phylo)
 export(argn)

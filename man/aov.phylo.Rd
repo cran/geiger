@@ -14,7 +14,8 @@ aov.phylo(formula, phy, nsim = 1000,
   \item{phy}{a phylogenetic tree of class 'phylo'}
   \item{nsim}{number of simulations to run}
   \item{test}{test statistic to apply if MANOVA}
-  \item{\dots}{additional arguments to be passed to \code{\link[stats]{print.anova}}}
+  \item{\dots}{additional arguments to be passed to the \code{print}
+    method for \code{\link{anova}}}
 }
 \details{
 This function performs an ANOVA or MANOVA in a phylogenetic context.  First, the test statistic for ANOVA 
@@ -25,7 +26,7 @@ the average squared independent contrast; for MANOVA the simulations use an esti
 matrix from \code{\link[geiger]{vcv.phylo}}.
 
 For MANOVA, you can specify the test statistic for the summary table.  Wilks' statistic is most popular in the 
-literature and for further details, see \code{\link[stats]{summary.manova}}.
+literature and for further details, see \code{\link{summary.manova}}.
 }
 \value{
 The function prints (and returns) a standard ANOVA or MANOVA table and p-value based on simulations (from the \code{Pr(phy)} column). For convenience, the summary table is included as an attribute of the returned object (see \bold{Examples}).
@@ -34,7 +35,7 @@ The function prints (and returns) a standard ANOVA or MANOVA table and p-value b
 Garland T Jr, AW Dickerman, CM Janis, and JA Jones. 1993. Phylogenetic analysis of covariance by computer simulation. \emph{Systematic Biology} 42(3):265-292.
 }
 \author{ LJ Harmon }
-\seealso{ \code{\link[stats]{aov}}; \code{\link[stats]{anova}}; \code{\link[stats]{summary.manova}}; \code{\link[geiger]{vcv.phylo}} }
+\seealso{ \code{\link[stats]{aov}}; \code{\link{anova}}; \code{\link{summary.manova}}; \code{\link[geiger]{vcv.phylo}} }
 \examples{
 
 geo=get(data(geospiza))

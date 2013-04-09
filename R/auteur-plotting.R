@@ -609,7 +609,7 @@ bg = "lightgreen", horiz = FALSE, width = NULL, height = NULL,
     }
 	if(missing(text)) text=lastPP$edge[,2]
 	
-    ape:::BOTHlabels(text, sel, XX, YY, adj, frame, pch, thermo, pie, 
+    ape::BOTHlabels(text, sel, XX, YY, adj, frame, pch, thermo, pie, 
 					 piecol, col, bg, horiz, width, height, ...)
 }
 
