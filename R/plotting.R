@@ -6,7 +6,7 @@ plot.rjmcmc <- function (x, trace = TRUE, density = TRUE, smooth = FALSE, bwf,
     oldpar <- NULL
     on.exit(par(oldpar))
     if (auto.layout) {
-        mfrow <- coda:::set.mfrow(Nchains = nchain(x), Nparms = nvar(x), 
+        mfrow <- .set.mfrow(Nchains = nchain(x), Nparms = nvar(x), 
 						   nplots = trace + density)
         oldpar <- par(mfrow = mfrow)
     }
@@ -33,7 +33,7 @@ auto.layout = TRUE, ask = dev.interactive(), ...)
     oldpar <- NULL
     on.exit(par(oldpar))
     if (auto.layout) {
-        mfrow <- coda:::set.mfrow(Nchains = nchain(x), Nparms = nvar(x), 
+        mfrow <- .set.mfrow(Nchains = nchain(x), Nparms = nvar(x), 
 						   nplots = trace + density)
         oldpar <- par(mfrow = mfrow)
     }
@@ -237,7 +237,11 @@ function(obj, col, alpha, lwd=1, hpd=0.95, bars=TRUE, legend.control=list(plot=T
 
 .shifts.plot <-
 function(samples, burnin=0, level=0.01, paint.branches=TRUE, colors=256, legend=TRUE, ...) {
-	
+
+        ## require colorspace
+        require(colorspace)
+	phy=samples$phy
+    
 	color.length=17
 
 	posterior.samples=list(rates=samples$rates, shifts=samples$shifts)
@@ -270,7 +274,8 @@ function(samples, burnin=0, level=0.01, paint.branches=TRUE, colors=256, legend=
 	
 	# collect edge colors (for rates)
 	if(paint.branches) {
-		colors.branches.tmp=.branchcol.plot(phy, ests, plot=FALSE, colors=list(branches=colors, legend=color.length, missing=1), log=logspace)
+    
+		colors.branches.tmp=.branchcol.plot(phy, as.data.frame(ests), plot=FALSE, colors=list(branches=colors, legend=color.length, missing=1), log=logspace)
 		colors.branches=colors.branches.tmp$col
 	} else {
 		colors.branches=1
@@ -415,7 +420,11 @@ function(samples, burnin=0, level=0.01, paint.branches=TRUE, colors=256, legend=
 
 .jumps.plot <-
 function(samples, burnin=0, level=0.01, paint.branches=TRUE, colors=256, legend=TRUE, ...) {
+
+        ## require colorspace
+        require(colorspace)
 	phy=samples$phy
+    
 	if(!"hphylo"%in%class(phy)) stop("Supply 'phy' as an 'hphylo' object")
 	if("mcmc"%in%class(samples$jumps)){
 		posterior.samples=samples$jumps
@@ -473,7 +482,7 @@ function(samples, burnin=0, level=0.01, paint.branches=TRUE, colors=256, legend=
 	if(paint.branches){
 		# scalars=j.var+bm.var
 		scalars=bm.var
-		colors.branches=.branchcol.plot(phy, scalars, plot=FALSE, colors=list(branches=colors, legend=17, missing=1))
+		colors.branches=.branchcol.plot(phy, as.data.frame(scalars), plot=FALSE, colors=list(branches=colors, legend=17, missing=1))
 		plot(phy, edge.color=colors.branches$col, no.margin=TRUE, ...)
 	} else {
 		plot(phy, no.margin=TRUE, ...)		
@@ -508,73 +517,93 @@ function(samples, burnin=0, level=0.01, paint.branches=TRUE, colors=256, legend=
 	return(jumps.res)
 }
 
-#general phylogenetic plotting utility, given a named vector or data.frame of values that can be associated with phy$edge[,2]
-#author: JM EASTMAN 2010
-#note: small values are given bluish hues, large values reddish hues; median values are given gray hues
+# general phylogenetic plotting utility, given a named vector or data.frame of values that can be associated with phy$edge[,2]
+# author: JM EASTMAN 2010
+# note: small values are given bluish hues, large values reddish hues; median values are given gray hues
+# added some stuff; numeric vector input didn't seem to be supported.
+.branchcol.plot <- function (phy, cur.rates, colors = list(branches = 256, legend = 17, missing = 1),
+	digits = 3, plot = TRUE, legend = TRUE, legend.title = "", log = FALSE, ...) {
 
-.branchcol.plot <-
-function(phy, cur.rates, colors=list(branches=256, legend=17, missing=1), digits=3, plot=TRUE, legend=TRUE, legend.title="", log=FALSE, ...) {
-	if(!"hphylo"%in%class(phy)) stop("Supply 'phy' as an 'hphylo' object")
-	if(!is.null(colnames(cur.rates))) {
-		cur.rates=cur.rates[,match(phy$hash[phy$edge[,2]],colnames(cur.rates))] 
+
+    ## require colorspace
+    require(colorspace)
+    
+	if (!"hphylo" %in% class(phy)) stop("Supply 'phy' as an 'hphylo' object");
+	
+	if ("data.frame" %in% class(cur.rates)) {
+		if (!is.null(colnames(cur.rates))) {
+			cur.rates <- cur.rates[,match(phy$hash[phy$edge[,2]], colnames(cur.rates))];
+		} else {
+			names(cur.rates) <- phy$hash[phy$edge[,2]];
+			warning("Rates assumed to be ordered as in 'phy$edge'");
+		}
+	} else if ("numeric" %in% class(cur.rates)) {
+		if (!is.null(names(cur.rates))) {
+			cur.rates <- cur.rates[match(phy$hash[phy$edge[,2]], names(cur.rates))];
+		} else {
+			names(cur.rates) <- phy$hash[phy$edge[,2]];
+			warning("Rates assumed to be ordered as in 'phy$edge'");
+		}
+		cur.rates <- as.data.frame(t(cur.rates));
 	} else {
-		names(cur.rates)=phy$hash[phy$edge[,2]]
-		warning("Rates assumed to be ordered as in 'phy$edge'")
+		stop("Expecting either a data.frame or named numeric vector");
 	}
-	cur.rates=apply(cur.rates, 2, function(x) {
-					if(any(!is.na(x))){
-						return(median(x, na.rm=TRUE))
-					} else {
-						return(NA)
-					}
+	
+	cur.rates <- apply(cur.rates, 2, function(x) {
+		if (any(!is.na(x))) {
+			return(median(x, na.rm=TRUE));
+		} else {
+			return(NA);
+		}
 	})
-	if(log) {
-		ests=log(cur.rates) 
+	if (log) {
+		ests <- log(cur.rates);
 	} else {
-		ests=cur.rates
+		ests <- cur.rates;
 	}
 	
-	ms=median(ests, na.rm=TRUE)
-	mm=sapply(ests, function(x) x-ms)
-	cce=diverge_hcl(2*colors$branches+1, power = 0.5)
-	lcce=cce[round(seq(1, length(cce), length=colors$legend))]
-	e.seq=seq(-max(abs(mm+0.05*ms), na.rm=TRUE),max(abs(mm+0.05*ms), na.rm=TRUE),length=2*colors$branches+1)
-	lseq=e.seq+ms
-	lseq=seq(min(lseq), max(lseq), length=colors$legend)
-	lcce=cce[round(seq(1, length(cce), length=colors$legend))]
-	if(log) lseq=exp(rev(lseq)) else lseq=rev(lseq)
+	ms <- median(ests, na.rm=TRUE);
+	mm <- sapply(ests, function(x) x - ms);
+	cce <- diverge_hcl(2 * colors$branches + 1, power = 0.5);
+	lcce <- cce[round(seq(1, length(cce), length=colors$legend))];
+	e.seq <- seq(-max(abs(mm + 0.05 * ms), na.rm=TRUE), max(abs(mm + 0.05 * ms), na.rm=TRUE), length = 2 * colors$branches + 1);
+	lseq <- e.seq+ms;
+	lseq <- seq(min(lseq), max(lseq), length=colors$legend);
+	lcce <- cce[round(seq(1, length(cce), length=colors$legend))];
+	if (log) lseq <- exp(rev(lseq)) else lseq <- rev(lseq)
 	
-	ucr=unique(cur.rates)
-	ucr=ucr[!is.na(ucr)]
-	if(length(ucr)==1){
-		mp=cce[round(length(cce)/2)]
-		colors.branches=rep(mp, length(mm))
-		colors.branches[is.na(mm)]=colors$missing
+	ucr <- unique(cur.rates);
+	ucr <- ucr[!is.na(ucr)];
+	if (length(ucr) == 1) {
+		mp <- cce[round(length(cce)/2)];
+		colors.branches <- rep(mp, length(mm));
+		colors.branches[is.na(mm)] <- colors$missing;
 	} else {
-		colors.branches=sapply(mm, function(x) {
-							   if(is.na(x)) {
-							   return(colors$missing)
-							   } else {
-							   cce[which(min(abs(e.seq-x))==abs(e.seq-x))]
-							   }
+		colors.branches <- sapply(mm, function(x) {
+			if (is.na(x)) {
+				return(colors$missing);
+			} else {
+				cce[which(min(abs(e.seq - x)) == abs(e.seq - x))];
+			}
 		})
 	}
 	
-	if(plot) {
+	if (plot) {
 		plot.phylo(phy, cex=0.1, edge.color=colors.branches, ...)
-		if(legend) {
+		if (legend) {
 			legend("topright", title=legend.title, cex=0.5, pt.cex=1, text.col="darkgray", 
-				   legend = sprintf(paste("%", 2*digits, paste(digits, "f", sep=""), sep="."), lseq), pch=21, ncol=1, col = "darkgray", 
-				   pt.bg = rev(lcce), box.lty="blank", border="white")
+				   legend = sprintf(paste("%", 2*digits, paste(digits, "f", sep=""), sep="."), lseq),
+				   pch=21, ncol=1, col = "darkgray", pt.bg = rev(lcce), box.lty="blank", border="white");
 		}
 	} else {
-		return(list(col=colors.branches,legend.seq=lseq,legend.col=lcce))
+		return(list(col=colors.branches,legend.seq=lseq,legend.col=lcce));
 	}
 }
 
 
 
-#general phylogenetic plotting utility, which is a modification of ape:::edgelabels, plotting edge symbols at the temporal beginning of the branch
+
+#general phylogenetic plotting utility, which is a modification of ape::edgelabels, plotting edge symbols at the temporal beginning of the branch
 #author: E PARADIS 2009 and JM EASTMAN 2010
 #note: may not be trustworthy where lastPP$type is not "phylogram"
 
@@ -609,30 +638,12 @@ bg = "lightgreen", horiz = FALSE, width = NULL, height = NULL,
     }
 	if(missing(text)) text=lastPP$edge[,2]
 	
-    ape::BOTHlabels(text, sel, XX, YY, adj, frame, pch, thermo, pie, 
+    BOTHlabels(text, sel, XX, YY, adj, frame, pch, thermo, pie, 
 					 piecol, col, bg, horiz, width, height, ...)
 }
 
 
 
-#general printing utility for ensuring equal numbers of characters within columns and defining spacing between columns
-#author: JM EASTMAN 2010
-#note: works only for numeric dataframes
-
-.print.table=function(df,digits=4,buffer=5){
-	if(length(buffer) != ncol(df) | length(buffer)==1) buffer=rep(buffer[1],ncol(df))
-	if(length(digits) != ncol(df) | length(digits)==1) digits=rep(digits[1],ncol(df))
-	ss=sapply(round(df),nchar)
-	lar=df>1
-	nn=sapply(names(df),nchar)
-	
-# find longest string
-	strw=sapply(1:ncol(df), function(x) max(nn, max(1,(ss[lar])+digits[x],na.rm=TRUE),na.rm=TRUE))  
-	pr.df=data.frame(sapply(1:ncol(df), function(x) sprintf(paste("%",(strw[x]+buffer[x]),".",digits[x],"f",sep=""),df[,x])))   
-	names(pr.df)=names(df)
-	rownames(pr.df)=rownames(df)
-	print(pr.df)
-}
 
 
 .acegram=function(phy, dat, cex.node=2, cex.tip=2, labs=TRUE, ...){
@@ -671,5 +682,46 @@ bg = "lightgreen", horiz = FALSE, width = NULL, height = NULL,
 		points(hist$ptime,hist$phenotype,bg=.transparency("white",0.75),pch=21,cex=ifelse(hist$descendant<=Ntip(phy), cex.tip, cex.node))
 	}
 	points(0,alpha,bg=.transparency("white",0.75),pch=21,cex=cex.node)		
+}
+
+
+# Plotting utility from coda
+# Author: Martyn Plummer
+.set.mfrow <- function (Nchains = 1, Nparms = 1, nplots = 1, sepplot = FALSE) 
+{
+  mfrow <- if (sepplot && Nchains > 1 && nplots == 1) {
+    if (Nchains == 2) {
+      switch(min(Nparms, 5), c(1, 2), c(2, 2), c(3, 2), 
+             c(4, 2), c(3, 2))
+    }
+    else if (Nchains == 3) {
+      switch(min(Nparms, 5), c(2, 2), c(2, 3), c(3, 3), 
+             c(2, 3), c(3, 3))
+    }
+    else if (Nchains == 4) {
+      if (Nparms == 1) 
+        c(2, 2)
+      else c(4, 2)
+    }
+    else if (any(Nchains == c(5, 6, 10, 11, 12))) 
+      c(3, 2)
+    else if (any(Nchains == c(7, 8, 9)) || Nchains >= 13) 
+      c(3, 3)
+  }
+  else {
+    if (nplots == 1) {
+      mfrow <- switch(min(Nparms, 13), c(1, 1), c(1, 2), 
+                      c(2, 2), c(2, 2), c(3, 2), c(3, 2), c(3, 3), 
+                      c(3, 3), c(3, 3), c(3, 2), c(3, 2), c(3, 2), 
+                      c(3, 3))
+    }
+    else {
+      mfrow <- switch(min(Nparms, 13), c(1, 2), c(2, 2), 
+                      c(3, 2), c(4, 2), c(3, 2), c(3, 2), c(4, 2), 
+                      c(4, 2), c(4, 2), c(3, 2), c(3, 2), c(3, 2), 
+                      c(4, 2))
+    }
+  }
+  return(mfrow)
 }
 

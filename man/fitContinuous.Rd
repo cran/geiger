@@ -7,7 +7,7 @@
 \usage{
 fitContinuous(phy, dat, SE = 0, 
     model = c("BM","OU","EB","trend","lambda","kappa","delta","drift","white"),
-    bounds= list(), control = list(method = c("SANN","L-BFGS-B"),
+    bounds= list(), control = list(method = c("subplex","L-BFGS-B"),
     niter = 100, FAIL = 1e+200, hessian = FALSE, CI = 0.95), \dots)
 }
 \arguments{
@@ -53,7 +53,7 @@ Possible models are as follows:
 		bounds are \code{alpha = c(min = 0, max = 150)}}
 	\item{\bold{EB} }{is the Early-burst model (Harmon et al. 2010) and also called the \code{ACDC} model (accelerating-decelerating; Blomberg et al. 2003). Set by the \code{a} rate parameter, \code{EB} 
 		fits a model where the rate of evolution increases or decreases exponentially through time, under the model r[t] = r[0] * exp(a * t), where \code{r[0]} is the 
-		initial rate, \code{a} is the rate change parameter, and \code{t} is time. Default bounds are \code{a = c(min = -1, max = 1)}}
+		initial rate, \code{a} is the rate change parameter, and \code{t} is time. The maximum bound is set to \code{-0.000001}, representing a decelerating rate of evolution. The minimum bound is set to log(10^-5)/depth of the tree.}
 	\item{\bold{trend} }{is a diffusion model with linear trend in rates through time (toward larger or smaller rates). Default bounds are \code{slope = c(min = -100, max = 100)}}
 	\item{\bold{lambda} }{is one of the Pagel (1999) models that fits the extent to which the phylogeny predicts covariance among trait values for species. The model effectively transforms the tree: 
 		values of \code{lambda} near 0 cause the phylogeny to become more star-like, and a \code{lambda} value of 1 recovers the \code{BM} model. Default 
@@ -73,9 +73,7 @@ Possible models are as follows:
 	\code{fitContinuous} returns a list with the following four elements: 
 	
 		\item{\bold{lik} }{is the function used to compute the model likelihood. The returned function (\code{lik}) takes arguments that are necessary for the given model. 
-			For instance, if estimating a Brownian-motion model with unknown standard error, the arguments to the \code{lik} function would be \code{sigsq} and \code{SE} 
-			(see \bold{Examples}). The tree and data are stored internally within the \code{lik} function, which permits those elements to be efficiently reused when computing 
-			the likelihood under different parameter values 
+			For instance, if estimating a Brownian-motion model with unknown standard error, the arguments (\code{pars}) to the \code{lik} function would be \code{sigsq} and \code{SE}. By default, the function evaluates the likelihood of the model by assuming the maximum likelihood root state. This behavior can be changed in the call to \code{lik} with \code{lik(pars, root=ROOT.GIVEN)} where \code{pars} includes a value for the root state (z0). See \bold{Examples} for a demonstration. The tree and data are stored internally within the \code{lik} function, which permits those elements to be efficiently reused when computing the likelihood under different parameter values 
 		}
 		\item{\bold{bnd} }{is a matrix of the used bounds for the relevant parameters estimated in the model. Warnings will be issued if any parameter estimates occur at the supplied (or default) parameter bounds
 		}
@@ -89,6 +87,9 @@ Possible models are as follows:
 			sample-size corrected AIC (\code{aicc}). The number of observations for AIC computation is taken to be the number of trait values observed. 
 			If the Hessian is used, confidence intervals on the parameter estimates (\code{CI}) and the Hessian matrix (\code{hessian}) are also returned 
 		}
+}
+\note{
+    To speed the likelihood search, one may set an environment variable to make use of parallel processing, used by \code{\link[parallel]{mclapply}}. To set the environment variable, use \code{options(mc.cores=INTEGER)}, where \code{INTEGER} is the number of available cores. Alternatively, the \code{mc.cores} variable may be preset upon the initiation of an R session (see \code{\link[base]{Startup}} for details). 
 }
 \references{
 Blomberg SP, T Garland, and AR Ives. 2003. Testing for phylogenetic signal in comparative data: behavioral traits are more labile. \emph{Evolution} 57:717-745.
@@ -122,8 +123,12 @@ print(brownFit)
 #---- COMPUTE LIKELIHOOD
 flik=brownFit$lik
 print(argn(flik))
-print(flik(c(sigsq=0.07054568, SE=0, z0=4.205953))) # 8.243269
-print(flik(c(sigsq=0, SE=0.1138144, z0=4.235734))) # 9.805223
+
+# evaluate likelihood with different parameters (including root state) given
+print(flik(c(sigsq=0.07054568, SE=0, z0=4.205953), root=ROOT.GIVEN)) # 8.243269
+print(flik(c(sigsq=0.07054568, SE=0, z0=0), root=ROOT.GIVEN)) # -808.0432
+print(flik(c(sigsq=0, SE=0.1138144, z0=4.235734), root=ROOT.GIVEN)) # 9.805223
+print(flik(c(sigsq=0, SE=0.1138144))) # 9.805223
 
 
 #---- CREATE a FUNCTION to COMPARE MODELS
@@ -140,11 +145,10 @@ fitGeospiza=function(trait=c("wingL","tarsusL","culmenL","beakD","gonysW")){
 	lnl.se=numeric(length(models))
 	
 	for(m in 1:length(models)){
-		cat("\n\n\n\n\t*** ", paste(toupper(summaries[m]),": fitting ", sep=""),
-                    models[m], " with SE ***
-        \n", sep="")
+		cat("\n\n\n\n\t*** ", paste(toupper(summaries[m]),": fitting ", sep=""), models[m], 
+			" with SE *** \n", sep="")
 		tmp=fitContinuous(phy,dat[,trait],SE=NA, model=models[m],bounds=list(SE=c(0,0.5)))
-		print(tmp$opt)
+		print(tmp)
 		aic.se[m]=tmp$opt$aicc
 		lnl.se[m]=tmp$opt$lnL
 	}
@@ -155,11 +159,10 @@ fitGeospiza=function(trait=c("wingL","tarsusL","culmenL","beakD","gonysW")){
 	lnl=numeric(length(models))
 	
 	for(m in 1:length(models)){
-		cat("\n\n\n\n\t*** ", paste(toupper(summaries[m]),": fitting ", sep=""), 
-                    models[m], " ***
-        \n", sep="")
+		cat("\n\n\n\n\t*** ", paste(toupper(summaries[m]),": fitting ", sep=""), models[m],
+			 " *** \n", sep="")
 		tmp=fitContinuous(phy,dat[,trait],SE=0,model=models[m])
-		print(tmp$opt)
+		print(tmp)
 		aic[m]=tmp$opt$aicc
 		lnl[m]=tmp$opt$lnL
 	}
@@ -170,7 +173,7 @@ fitGeospiza=function(trait=c("wingL","tarsusL","culmenL","beakD","gonysW")){
 		
 	# no measurement error
 	daic=delta_aic(aic)
-	cat("\n\n\n\t\t\t\t*** MODEL COMPARISON: ",trait,"*** \n",sep="")
+	cat("\n\n\n\t\t\t\t*** MODEL COMPARISON: ",trait," *** \n",sep="")
 	cat("\tdelta-AIC values for models assuming no measurement error
     \t\t\t\t zero indicates the best model\n\n")
 	print(daic, digits=2)

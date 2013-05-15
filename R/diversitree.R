@@ -1,11 +1,18 @@
 
 ## FUNCTIONS from diversitree 0.9-4: commit ec08b1d2bd from 06-22-2012 @ 'https://github.com/richfitz/diversitree'
 
-drop.tip=function(phy, tip, trim.internal = TRUE, subtree = FALSE,
-         root.edge = 0, rooted = is.rooted(phy)) {
+.drop.tip=function(phy, tip, trim.internal = TRUE, subtree = FALSE, root.edge = 0, rooted = is.rooted(phy)){
+  
+  
+  if(missing(tip)) return(phy)
+  if (is.character(tip)) tip <- which(phy$tip.label %in% tip)
+  if(!length(tip)) return(phy)
+    
+  phy=as.phylo(phy)
   Ntip <- length(phy$tip.label)
-  if (is.character(tip)) 
-    tip <- which(phy$tip.label %in% tip)
+  tip=tip[tip%in%c(1:Ntip)]
+  if(!length(tip)) return(phy)
+
 
   phy <- reorder(phy)
   NEWROOT <- ROOT <- Ntip + 1
@@ -128,7 +135,7 @@ ROOT.ALL   <- ROOT.BOTH
 				names(states) <- tree$tip.label
 				warning("Assuming states are in tree$tip.label order")
 			} else {
-				stop(sprintf("Invalid states length (expected %d)", length(tree$tip.label)))
+				stop(sprintf("Invalid states length (expected %s)", length(tree$tip.label)))
 			}
 		} else {
 			stop("The states vector must contain names")
@@ -149,7 +156,7 @@ ROOT.ALL   <- ROOT.BOTH
 		} else {
 			extra <- setdiff(sort(unique(na.omit(states))), strict.vals)
 			if ( length(extra) > 0 )
-			stop(sprintf("Unknown states %d not allowed in states vector", paste(extra, collapse=", ")))
+			stop(sprintf("Unknown states %s not allowed in states vector", paste(extra, collapse=", ")))
 		}
 	}
 	
@@ -435,10 +442,10 @@ ROOT.ALL   <- ROOT.BOTH
 
 
 
-.make.cache.mkn <- function(tree, states, k, strict, control) {
+.make.cache.mkn <- function(tree, states, k, strict, control, ...) {
 	method <- control$method
 	method=match.arg(method, "exp")
-	tree <- .check.tree(tree)
+	tree <- .check.tree(tree, ...)
 	if ( !is.null(states) ) # for multitrait
     states <- .check.states(tree, states, strict.vals=1:k)
 	cache <- .make.cache(tree)
@@ -693,7 +700,7 @@ is.constrained <- function(x) inherits(x, "constrained")
 ## the "paired" parameters here to avoid using eval where
 ## unnecessary.  However, this makes the function substantially uglier
 ## for a very minor speedup.
-constrain <- function(f, ..., formulae=NULL, names=argn(f), extra=NULL) {
+.constrain <- function(f, ..., formulae=NULL, names=argn(f), extra=NULL) {
 	if ( is.constrained(f) ) {
         stop("'f' appears already constrained")
 		formulae <- c(attr(f, "formulae"), formulae)

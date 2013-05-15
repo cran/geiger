@@ -15,6 +15,7 @@
 \alias{argn.mkn}
 \alias{argn<-}
 \alias{argn<-.bm}
+\alias{as.phylo.hphylo}
 \alias{bf}
 \alias{bm.lik}
 \alias{cherries}
@@ -66,6 +67,8 @@
 \alias{print.auteurRAW}
 \alias{print.bayesfactor}
 \alias{print.constraint.m}
+\alias{print.glnL}
+\alias{print.gprior}
 \alias{print.mcmc.list}
 \alias{print.rbm}
 \alias{print.rjmcmc}
@@ -74,10 +77,10 @@
 \alias{print.transformer}
 \alias{resplitEdgeMatrixGeiger}
 \alias{root.phylo}
+\alias{sim.mecca}
 \alias{sem}
 \alias{span.phylo}
 \alias{splitEdgeMatrixGeiger}
-\alias{transform}
 \alias{ultrametricize.phylo}
 \alias{unique.multiPhylo}
 \alias{unique.phylo}
