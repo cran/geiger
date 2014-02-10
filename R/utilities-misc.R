@@ -54,8 +54,9 @@ aicw <- function (x) {
 	print(pr.df)
 }
 
-# ooh, this is nice.
-.get.parallel <- function(ncores = NULL, ...) {
+## 2014-03-04: this was EVIL and against CRAN policies
+## Also, essentially overhead: parallel::mclapply does this if MC.CORES is set correctly.
+.get.parallel <- function(ncores = Sys.getenv("MC.CORES", 2L), ...) {
 	if ((Sys.getenv("R_PARALLEL") == "FALSE")) {
 		fx <- function(X, FUN, ...) lapply(X, FUN, ...);
 	} else {

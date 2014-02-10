@@ -1,5 +1,5 @@
 115a0ec003fa50969bc19698f4e958f9 *ChangeLog
-2fb04c013ebef8479c60931699e5cf01 *DESCRIPTION
+8abade5484bc5ddecb267ee99ecfaa5b *DESCRIPTION
 e3f85ec65347d9583873ca0503a710a5 *NAMESPACE
 58eeb29af6241fde32ca77b23146b1a2 *R/TESTING.R
 a994b24a62f009cd2acc80ba3ba693bc *R/congruify.R
@@ -22,7 +22,7 @@ eaa1401464a3c02cd190384ccba77bb6 *R/plotting.R
 d9acee8f9b96cc066a206d8deaabff3a *R/simulation.R
 3017ce8af89d6f1189940682d06bacce *R/traits-fossil.R
 d1004cdcd2d3dc08fc190a892789d7c2 *R/traits.R
-051fcf22c7ae6ca8f7c4e533ce203e0f *R/utilities-misc.R
+0263d4048bd46b0849506b387921373a *R/utilities-misc.R
 7667e9fed8f22c73de22540de18ecf50 *R/utilities-phylo.R
 30025a7691d8bad9e09a2d3933138326 *R/utilities-print.R
 6a746701150db47c5a50cd22fc38b123 *R/utilities-stat.R
