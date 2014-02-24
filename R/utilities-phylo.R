@@ -194,7 +194,7 @@ is.root <- function (node,phy) {
 }
 
 
-nodelabel.phylo=function(phy, taxonomy, strict=TRUE){
+nodelabel.phylo=function(phy, taxonomy, strict=TRUE, ncores=NULL){
     # all phy$tip.label must be in taxonomy
     # taxonomy: exclusivity highest on left, lowest on right (species, genus, family, etc., as columns)
     # columns in 'taxonomy' should ONLY be taxonomic ranks
@@ -265,7 +265,7 @@ nodelabel.phylo=function(phy, taxonomy, strict=TRUE){
 	}
 	
     #	cat("resolving descendants for splits in tree...\n")
-	tmp=hashes.phylo(phy, tips)
+	tmp=hashes.phylo(phy, tips, ncores=ncores)
 	hashes_tree=tmp$hash
 	phy$node.label=rep("",max(phy$edge))
 	mm=match(hashes_tree, hashes_labels)
@@ -319,7 +319,7 @@ nodelabel.phylo=function(phy, taxonomy, strict=TRUE){
         #		rownames(edges)=1:nrow(edges)
 		N=Ntip(phy)
         
-        ff=.get.parallel()
+        ff=.get.parallel(ncores)
         
 		dist=unlist(ff(desc, function(x) {
             y=tidx%in%x
@@ -475,7 +475,7 @@ is.phylo=function(x) "phylo"%in%class(x)
 # allows for recursion in clade definitions (clade defined in part using another clade definition)
 # returns trees representing each clade definition
 # 'nested': an important variable -- this is the subset of clades that are defined (recursively) within 'clades'
-phylo.clades=function(clades, phy=NULL, unplaced=TRUE){
+phylo.clades=function(clades, phy=NULL, unplaced=TRUE, ncores=NULL){
 	
     ## give 'phy' as a multiPhylo, named list of trees (whose labels appear in the clade defs)
     ## clades:
@@ -628,7 +628,7 @@ phylo.clades=function(clades, phy=NULL, unplaced=TRUE){
    		tt=master$tip.label
    		null=.hash.tip(c(), tt)
 		
-   		mm=hashes.phylo(master, tt)
+   		mm=hashes.phylo(master, tt, ncores=ncores)
    		ss=sapply(phy, function(x) .hash.tip(x$tip.label, tt))
    		if(any(ss==null)){
 			warning(paste("The following not encountered:\n\t", paste(names(ss)[which(ss==null)], collapse="\n\t")))
@@ -659,7 +659,7 @@ phylo.clades=function(clades, phy=NULL, unplaced=TRUE){
 }
 
 
-lookup.phylo=function(phy, taxonomy=NULL, clades=NULL){
+lookup.phylo=function(phy, taxonomy=NULL, clades=NULL, ncores=NULL){
     ## taxonomy expected to have first column at same level as tip labels in phy
     ## first row in taxonomy is most exclusive
     ## clade_defs are phylogenetic trees of a clade representation
@@ -757,7 +757,7 @@ lookup.phylo=function(phy, taxonomy=NULL, clades=NULL){
 	
 	if(!is.null(clades)){
 		tips=phy$tip.label
-		clade_defs=phylo.clades(clades)
+		clade_defs=phylo.clades(clades, ncores=ncores)
         #		cat("resolving clades...\n\t")
 		res=lapply(1:length(clade_defs), function(idx) {
             def=clade_defs[[idx]]
@@ -830,7 +830,7 @@ lookup.phylo=function(phy, taxonomy=NULL, clades=NULL){
 	return(taxonomy)
 }
 
-phylo.lookup=function(taxonomy) {
+phylo.lookup=function(taxonomy, ncores=NULL) {
     # GENERAL FUNCTION: convert taxonomic 'lookup' table to phylogeny
     # lookup is data.frame with ranks as columns
     # rowlabels of 'taxonomy' are assumed to be tips of the phylogeny
@@ -850,7 +850,7 @@ phylo.lookup=function(taxonomy) {
         occurrences=c(occurrences, root=mm)
     }
 	
-    f=.get.parallel()
+    f=.get.parallel(ncores)
 	
     #clds=f(names(occurrences), function(x) {
     #		tmp=which(tax==x, arr.ind=TRUE)
@@ -947,7 +947,7 @@ phylo.lookup=function(taxonomy) {
     op$expressions=max(op$expressions, 500000)
     options(op)
 	
-	tmp=phylo.clades(defs)
+	tmp=phylo.clades(defs, ncores=ncores)
 	phy=tmp[[length(defs)]]
 	tt=table(phy$tip.label)
 	if(any(tt>1)){

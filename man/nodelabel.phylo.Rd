@@ -10,10 +10,10 @@ Blending information from taxonomies and trees}
 \description{
 working with systematic reference tables and phylogenies}
 \usage{
-nodelabel.phylo(phy, taxonomy, strict=TRUE)
-phylo.lookup(taxonomy)
-lookup.phylo(phy, taxonomy = NULL, clades = NULL)
-phylo.clades(clades, phy=NULL, unplaced=TRUE)
+nodelabel.phylo(phy, taxonomy, strict=TRUE, ncores=NULL)
+phylo.lookup(taxonomy, ncores=NULL)
+lookup.phylo(phy, taxonomy = NULL, clades = NULL, ncores=NULL)
+phylo.clades(clades, phy=NULL, unplaced=TRUE, ncores=NULL)
 glomogram.phylo(phy, subtrees)
 }
 
@@ -24,7 +24,9 @@ glomogram.phylo(phy, subtrees)
   \item{clades}{a named list of clade definitions (i.e., spanning taxa; see \bold{Examples}); spanning taxa may invoke other definitions found within the \code{clades} list}
   \item{unplaced}{whether to use 'unplaced' taxa if given as an element in \code{clades}} 
   \item{subtrees}{a list of trees to be grafted into \code{phy}; each \code{subtrees} element must either be a 'phylo' or 'multiPhylo' object with branch lengths in the same units as \code{phy} (see \bold{Examples})}
-  \item{strict}{whether to enforce strict labeling of nodes or allow liberal estimates of the best location of a given nodelabel}
+  \item{strict}{whether to enforce strict labeling of nodes or allow
+    liberal estimates of the best location of a given nodelabel}
+  \item{ncores}{the maximum number of cores to be used}
 }
 
 \details{
@@ -47,7 +49,7 @@ print(head(sal$tax))
 
 ## TREE from TABLE: phylo.lookup()
 tax=cbind(sal$tax[,c("subfamily", "family", "suborder")], order="Caudata")
-tphy=phylo.lookup(tax)
+tphy=phylo.lookup(tax, ncores=2)
 print(tphy)
 head(tphy$node.label)
 
@@ -59,9 +61,9 @@ cld=list(
 	Cryptobranchoidea=c("Hynobius_naevius", "Cryptobranchus_alleganiensis"),
 	CAUDATA=c("Sirenoidea","Salamandroidea","Cryptobranchoidea")
 )
-lkp=lookup.phylo(sal$phy, taxonomy=tax, clades=cld)
+lkp=lookup.phylo(sal$phy, taxonomy=tax, clades=cld, ncores=2)
 print(lkp)
-nphy=nodelabel.phylo(sal$phy, lkp)
+nphy=nodelabel.phylo(sal$phy, lkp, ncores=2)
 dev.new()
 plot.phylo(ladderize(nphy,right=FALSE), cex=0.35, 
 type="fan", label.offset=2.5, no.margin=TRUE, edge.color="gray", edge.width=0.5)
@@ -83,8 +85,8 @@ clades=list(
 phy=list(Cryptobranchoidea=cryptobranchoidea, Salamandroidea=salamandroidea, Siren=siren)
 class(phy)="multiPhylo"
 
-res=phylo.clades(clades, phy)
-amph=nodelabel.phylo(res$AMPHIBIA, lkp)
+res=phylo.clades(clades, phy, ncores=2)
+amph=nodelabel.phylo(res$AMPHIBIA, lkp, ncores=2)
 print(amph$FUN("Salamandroidea"))
 dev.new()
 plot(ladderize(amph, right=FALSE), cex=0.2, label.offset=0.05)
@@ -104,7 +106,7 @@ class(trees)="multiPhylo"
 fam=sal$fam
 ftax=unique(sal$tax[,c("family", "suborder")])
 rownames(ftax)=unname(ftax[,"family"])
-fam=nodelabel.phylo(fam, ftax)
+fam=nodelabel.phylo(fam, ftax, ncores=2)
 fam$FUN("Salamandroidea")
 
 res=glomogram.phylo(fam, trees)

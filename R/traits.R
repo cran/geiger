@@ -4,7 +4,8 @@ dat,
 SE = 0,
 model=c("BM", "OU", "EB", "trend", "lambda", "kappa", "delta", "drift", "white"),
 bounds=list(),
-control=list(method=c("subplex","L-BFGS-B"), niter=100, FAIL=1e200, hessian=FALSE, CI=0.95), ...
+control=list(method=c("subplex","L-BFGS-B"), niter=100, FAIL=1e200, hessian=FALSE, CI=0.95), 
+ncores=NULL, ...
 )
 {
     
@@ -130,7 +131,7 @@ control=list(method=c("subplex","L-BFGS-B"), niter=100, FAIL=1e200, hessian=FALS
     max=bnds[argn,"mx"]
     
     # mclapply or lapply
-    fxopt=.get.parallel()
+    fxopt=.get.parallel(ncores)
     
     # 'method' optimization
 	out=fxopt(1:ct$niter, function(i){
@@ -572,6 +573,7 @@ model=c("ER","SYM","ARD","meristic"),
 transform=c("none", "EB","lambda", "kappa", "delta", "white"), 
 bounds=list(), 
 control=list(method=c("subplex","L-BFGS-B"), niter=100, FAIL=1e200, hessian=FALSE, CI=0.95),
+ncores=NULL,
 ...)
 {
 	
@@ -693,7 +695,7 @@ control=list(method=c("subplex","L-BFGS-B"), niter=100, FAIL=1e200, hessian=FALS
     max=bnds[parnm,"mx"]
 	
     # mclapply or lapply
-    fxopt=.get.parallel()
+    fxopt=.get.parallel(ncores)
     
     # 'method' optimization
 	out=fxopt(1:ct$niter, function(i){
@@ -1025,8 +1027,15 @@ aov.phylo=function(formula, phy, nsim=1000, test=c("Wilks", "Pillai", "Hotelling
     colnames(out)=gsub(" ", "-", colnames(out))
     sims<-sim.char(phy, s, nsim=nsim)
     f.null<-apply(sims, 3, FUN)
-    p.phylo=(sum(f.null>f.data)+1)/(nsim+1)
-
+    if(multivar) {
+    	if(test=="Wilks") {
+    		p.phylo = (sum(f.null < f.data) + 1)/(nsim + 1)
+    	} else {
+    		p.phylo = (sum(f.null > f.data) + 1)/(nsim + 1)
+    	}
+    } else {
+    	p.phylo = (sum(f.null > f.data) + 1)/(nsim + 1)
+    }
     out$'Pr(phy)'=c(p.phylo, NA)
     class(out) <- c("anova", "data.frame")
     print(out, ...)
