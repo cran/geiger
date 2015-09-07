@@ -1,5 +1,5 @@
 9863db74d0ccabc2bc95243569f3e36b *ChangeLog
-421c97582d0a26c661a47af8d202e62f *DESCRIPTION
+d0f8a91c12c39f82234c6a2323f2e032 *DESCRIPTION
 a0985d243c15e4c2ebfa6907167087e8 *NAMESPACE
 0edcd9f70272d54c87207db78db82b24 *R/TESTING.R
 3a9c2076e963a28ee15719d3f370c862 *R/congruify.R
@@ -9,7 +9,7 @@ bf4c716f35eb57ae591529618d98dfd0 *R/deprecated.R
 179db6e31104fe9f570f88658ac701ab *R/diversitree.R
 f794e580346ed592efb6849a11bce433 *R/edges.R
 f386f58937b950aa32130ca37ec51152 *R/examples.R
-6c35bea5dbc5cc252287c6902cec124d *R/gbresolve.R
+b7ee78d65602a47f36695fbc5394edbf *R/gbresolve.R
 fa86a18c48254ee3b58a175337ab5483 *R/glomogram.R
 285c35cc58f185b13252e5577c19d963 *R/internal.R
 a7c9795f37a7706864ee3c9b1e31888c *R/likelihood.R
@@ -26,7 +26,7 @@ b37dacc21196da9c7a06754d318065c3 *R/plotting.R
 d6901806ec0e25acdd2f0bfd9dc8f079 *R/utilities-phylo.R
 30025a7691d8bad9e09a2d3933138326 *R/utilities-print.R
 6a746701150db47c5a50cd22fc38b123 *R/utilities-stat.R
-5728a071f6089bbec6cccc6f1025c7e2 *README.md
+ae5755857993ac4de1b9993360a07afc *README.md
 b6adf6da014358fb49bf3f35d7f6d7d2 *data/amphibia.rda
 3e887f67cecd3ec33bac6388447cf2ca *data/caniformia.rda
 30bd1c33a30aa22c83e4c3532dbfc40a *data/carnivores.rda
@@ -46,10 +46,10 @@ cf6ff064bb627bf81966c34d489a231a *man/aicm.Rd
 90850dc6414b2fba56576387b047705f *man/dcount.Rd
 6568d578201ea42b2e31267c0b6f4a8c *man/drop.extinct.Rd
 e2838629514b185dde78f308ff9219a3 *man/dtt.Rd
-65ad232fadf63d822f20aa18044f6f24 *man/fitContinuous.Rd
+22f454bdbae381c0d2202964f4422171 *man/fitContinuous.Rd
 7d4e67935b9d8dc2cc80860447a8a98a *man/fitContinuousMCMC.Rd
-fa6d437bfe846ed5baf57bc56c3ab8c7 *man/fitDiscrete.Rd
-36ad06d33fc85c0c811fea8c5b8e6c14 *man/gbresolve.Rd
+6fef38ce67eeebb6517744757ef5cc46 *man/fitDiscrete.Rd
+3ba6e790a3b73e771c7b43d5816456ca *man/gbresolve.Rd
 7e84d45cc1bf5448bdd009f4f1bd6e96 *man/geiger-data.Rd
 7cbbecf3efe9f94497a0fb44e22e0429 *man/geiger-defunct.Rd
 74bfc22e335fddada7e0b6d5c7b14428 *man/geiger-examples.Rd
@@ -72,7 +72,7 @@ acf7044a771cc3879bf163ddbfd98129 *man/rjmcmc.bm.Rd
 f264909ffe5468b34d4f999d1cbf1176 *man/sim.bdtree.Rd
 c32238107aef55f3ad47896ce8b3e4ba *man/sim.char.Rd
 a9a6b7539b29d665e2d63c20521db066 *man/startingpt.mecca.Rd
-01c753ff8df3a543f5f510d116bffa84 *man/subset.phylo.Rd
+5f1feec2375ff4f96bb2cc1fbd3817cc *man/subset.phylo.Rd
 7dd89e661d27d71908ab27b1867f3688 *man/tips.Rd
 18cdda39a1fc77156b47d4d00bcff7f9 *man/to.auteur.Rd
 f8e5b6e7bc1c8cf0672a359f0c091f4d *man/treedata.Rd
