@@ -1,5 +1,5 @@
 9863db74d0ccabc2bc95243569f3e36b *ChangeLog
-d0f8a91c12c39f82234c6a2323f2e032 *DESCRIPTION
+5f5c35d1533d2ac933495688db68dad2 *DESCRIPTION
 a0985d243c15e4c2ebfa6907167087e8 *NAMESPACE
 0edcd9f70272d54c87207db78db82b24 *R/TESTING.R
 3a9c2076e963a28ee15719d3f370c862 *R/congruify.R
@@ -77,9 +77,10 @@ a9a6b7539b29d665e2d63c20521db066 *man/startingpt.mecca.Rd
 18cdda39a1fc77156b47d4d00bcff7f9 *man/to.auteur.Rd
 f8e5b6e7bc1c8cf0672a359f0c091f4d *man/treedata.Rd
 88c5da38b50ad85daa41cdf3029d5db3 *src/APE_reorder_phylo.c
-182777d87c6288768b4b578a66672683 *src/Makevars
-690552e395c37f6fcc1421c913c102a2 *src/Makevars.win
+4a000ee196d5240b54066c1bf9d1615f *src/Makevars
+4a000ee196d5240b54066c1bf9d1615f *src/Makevars.win
 39cadae115675a71860bfc8238f1d37e *src/branches.cpp
+e2bfe98672afe1edc14e1c6de459d79c *src/init.c
 c97ffec273741438a0b959ecb2ff8bbd *src/mkn.c
 9bea58817acffee5322e5162e920545b *src/mkn.h
 646345ffeb7f1278bb4860513992ecde *src/pic.c
