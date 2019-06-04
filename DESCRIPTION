@@ -1,7 +1,7 @@
 Package: geiger
 Type: Package
 Title: Analysis of Evolutionary Diversification
-Version: 2.0.6.1
+Version: 2.0.6.2
 Date: 2015-09-07
 Author: Luke Harmon <lukeh@uidaho.edu>, Jason Weir, Chad Brock, Rich
         Glor, Wendell Challenger, Gene Hunt, Rich FitzJohn, Matt Pennell, Graham Slater, Joseph Brown, Josef Uyeda, and Jon Eastman <jonathan.eastman@gmail.com>
@@ -15,9 +15,9 @@ License: GPL (>= 2)
 URL: http://www.webpages.uidaho.edu/~lukeh/software.html
 ByteCompile: yes
 NeedsCompilation: yes
-Packaged: 2019-01-15 13:15:07 UTC; ripley
+Packaged: 2019-06-04 09:54:12 UTC; ripley
 Repository: CRAN
-Date/Publication: 2019-01-16 08:02:03 UTC
+Date/Publication: 2019-06-04 10:19:01 UTC
 X-CRAN-Original-Maintainer: Matt Pennell <mwpennell@gmail.com>
 X-CRAN-Comment: Orphaned and corrected on 2019-01-16 as no response to
         request for corrections.
