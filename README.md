@@ -10,6 +10,7 @@ install.packages("geiger")
 or installed directly from github with the [devtools](https://github.com/hadley/devtools) package
 ```
 install.packages("devtools")
+library(devtools)
 install_github("mwpennell/geiger-v2")
 ```
 
@@ -31,7 +32,7 @@ Here is a a non-comprehensive list of methods:
 
 If you use geiger, please cite:
 
-Pennell, M.W., J.M. Eastman, G.J. Slater, J.W. Brown, J.C. Uyeda, R.G. FitzJohn, M.E. Alfaro, and L.J. Harmon. 2014. geiger v2.0: an expanded suite of methods for fitting macroevolutionary models to phylogenetic trees. Bioinformatics 15:2216-2218.
+Pennell, M.W., J.M. Eastman, G.J. Slater, J.W. Brown, J.C. Uyeda, R.G. FitzJohn, M.E. Alfaro, and L.J. Harmon. 2014. geiger v2.0: an expanded suite of methods for fitting macroevolutionary models to phylogenetic trees. Bioinformatics 30:2216-2218.
 
 in addition to the original papers describing the methods.
 

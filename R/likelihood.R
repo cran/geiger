@@ -174,7 +174,7 @@ function(rphy, ic) {
     )
 	
 	ll.bm.direct <- function(pars, datc) {
-        out = .Call("bm_direct", dat = datc, pars = pars, PACKAGE = "geiger")
+        out = .Call("bm_direct", dat = datc, pars = pars, package = "geiger")
 #       vals = c(out$initM[rootidx], out$initV[rootidx], out$lq[rootidx])
         loglik <- sum(out$lq)
 #       intermediates=FALSE

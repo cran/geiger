@@ -98,7 +98,7 @@
 #         #print(datC)
 #         parsC=as.numeric(rep(sigsq, n.cache$z))
 #
-#         out = .Call("bm_direct", dat = datC, pars = parsC, PACKAGE = "geiger")
+#         out = .Call("bm_direct", dat = datC, pars = parsC, package = "geiger")
 #         loglik <- sum(out$lq)
 # 		if(is.na(loglik)) loglik=-Inf
 #         attr(loglik, "ROOT.MAX")=out$initM[datC$root]

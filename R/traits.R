@@ -64,7 +64,7 @@ ncores=NULL, ...
 	argn=argn(lik)
 
     ## CONSTRUCT BOUNDS ##
-	mn=c(-500, -500, (log(10^(-5))/max(branching.times(phy))), -100, -100, -500, -500, -500, -500)
+	mn=c(-500, -500, (log(10^(-5))/max(node.depth.edgelength(phy))), -100, -100, -500, -500, -500, -500)
 	mx=c(100, 1, -0.000001, 100, 100, 0, 0, log(2.999999), 100)
 	bnds=as.data.frame(cbind(mn, mx))
 	bnds$typ=c("exp", "exp", "nat", "nat", "nat", "exp", "exp", "exp", "exp")
@@ -374,7 +374,7 @@ bm.lik=function(phy, dat, SE = NA, model=c("BM", "OU", "EB", "trend", "lambda", 
         #print(datC)
         parsC=as.numeric(rep(sigsq, n.cache$z))
 
-        out = .Call("bm_direct", dat = datC, pars = parsC, PACKAGE = "geiger")
+        out = .Call("bm_direct", dat = datC, pars = parsC, package = "geiger")
         loglik <- sum(out$lq)
 		if(is.na(loglik)) loglik=-Inf
         attr(loglik, "ROOT.MAX")=out$initM[datC$root]
@@ -607,19 +607,8 @@ ncores=NULL,
         class(res)=c("gfits", class(res))
 		return(res)
 	} else {
-		tmp=dat[,1]
-		names(tmp)=rownames(dat)
-		dat=tmp
-		#if(!all(is.integer(dat))) stop("supply 'dat' as a vector (or matrix) of positive integers")
-
-		# this changes the discrete data to 1:n and remembers the original charStates
-		fdat<-as.factor(dat)
-		charStates<-levels(fdat)
-		k<-nlevels(fdat)
-
-		ndat<-as.numeric(fdat)
-    	names(ndat) <- names(fdat)
-
+		ndat <- dat[,1]; # ah, gotta love R scoping...
+		charStates <- sort(unique(ndat));
 	}
 
 

@@ -180,7 +180,7 @@ is.root <- function (node,phy) {
     DES=as.integer(phy$edge[,2])
     )
 
-	res=.Call("cache_descendants", phy=zz, PACKAGE="geiger")
+	res=.Call("cache_descendants", phy=zz, package="geiger")
 	return(res)
 }
 
