@@ -729,7 +729,7 @@ function(vv, node, value, exclude=NULL, cache){
 	node=as.integer(node)
 	exclude=as.integer(exclude)
 	dat=list(N=N, n=n, node=node, exclude=exclude)
-	res=.Call("open_subtree", dat=dat, desc=adesc, package="geiger")
+	res=.Call("open_subtree", dat=dat, desc=adesc, PACKAGE="geiger")
 	res
 }
 
