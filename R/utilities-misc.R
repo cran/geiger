@@ -1,5 +1,13 @@
 .geigerwarn <- function(...) warning("the called function is currently in development and is not fully vetted", ...);
 
+as.Qmatrix.gfit<-function(x,...){
+	if("mkn"%in%class(x$lik)){
+		object<-.Qmatrix.from.gfit(x)
+		class(object)<-"Qmatrix"
+		return(object)
+	} else cat("\"gfit\" object does not appear to contain a Q matrix.\n")
+}
+
 coef.gfit <- function(object, ...) {
     if (is.constrained(object$lik)) p=names(object$lik(argn(object$lik),pars.only=TRUE)) else p=argn(object$lik)
     if ("bm"%in%class(object$lik)) p=c(p, "z0");
@@ -11,7 +19,9 @@ coef.gfits <- function(object, ...) {
 }
 
 logLik.gfit <- function(object, ...) {
-    object$opt$lnL;
+    lik <- object$opt$lnL[1]
+	attr(lik, "df") <- object$opt$k[1]
+	lik
 }
 
 logLik.gfits <- function(object, ...) {
@@ -226,7 +236,7 @@ load.rjmcmc <- function(x, phy=NULL, burnin = NULL, thin = NULL, ...){
 	# TREES: collect trees and resolve variable topologies
 	trees=lapply(raw, "[[", "phy")
 	class(trees)="multiPhylo"
-	uu=unique(trees)
+	uu=uniqueMultiPhylo(trees)
 	if(length(uu)>1){
 		if(is.null(phy)) stop("Encountered multiple topologies: a summary tree is necessary (supplied via the 'phy' argument)")
 	} else {
@@ -549,7 +559,7 @@ to.coda=function(obj){
     # ensure identity of trees
 	trees=sapply(samples, function(x) x$phy)
 	class(trees)="multiPhylo"
-	uu=unique(trees)
+	uu=uniqueMultiPhylo(trees)
 	if(length(uu)==1){
 		phy=uu[[1]]
 	} else {

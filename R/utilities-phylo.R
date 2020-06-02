@@ -9,16 +9,16 @@ heights.phylo=function(x){
 	phy <- reorder(phy, "postorder")
 	n <- length(phy$tip.label)
 	n.node <- phy$Nnode
-	xx <- numeric(n + n.node)
+	xx <- numeric(n + n.node) # ending times
 	for (i in nrow(phy$edge):1) xx[phy$edge[i, 2]] <- xx[phy$edge[i, 1]] + phy$edge.length[i]
 	root = ifelse(is.null(phy$root.edge), 0, phy$root.edge)
 	labs = c(phy$tip.label, phy$node.label)
 	depth = max(xx)
-	tt = depth - xx
+	tt = depth - xx # time to 'present day' of branch starts
 	idx = 1:length(tt)
-	dd = phy$edge.length[idx]
+	#dd = phy$edge.length[idx]
 	mm = match(1:length(tt), c(phy$edge[, 2], Ntip(phy) + 1))
-	dd = c(phy$edge.length, root)[mm]
+	dd = c(phy$edge.length, root)[mm] # reordered bls
 	ss = tt + dd
 	res = cbind(ss, tt)
 	rownames(res) = idx
@@ -114,18 +114,6 @@ unique.phylo=function(x, incomparables=FALSE, ...){
 	}
 }
 
-unique.multiPhylo=function(x, incomparables=FALSE, ...){
-	phy=x
-	if(incomparables) warning("'incomparables' exerts no effect in this setting")
-	ss=sapply(phy, digest)
-	if(any(dd<-duplicated(ss))){
-		sub=phy[-which(dd)]
-		class(sub)="multiPhylo"
-		return(sub)
-	} else {
-		return(phy)
-	}
-}
 
 # wrapper for plot.phylo: plot tree with internal nodes labelled with ape numbering
 plotNN <- function (phy, time = TRUE, margin = TRUE, ...) {
@@ -977,6 +965,9 @@ name.check <- function(phy, data, data.names = NULL) {
 	r <- list(sort(r1), sort(r2));
 
 	names(r) <- cbind("tree_not_data", "data_not_tree")
+
+	class(r) <- "name.check"
+
 	if (length(r1) == 0 && length(r2) == 0) {
 		return("OK");
 	} else {
@@ -1350,11 +1341,13 @@ argn.mkn=function(x, ...){
 }
 
 ## tree transformation
-rescale.phylo=function(x, model=c("BM", "OU", "EB", "nrate", "lrate", "trend", "lambda", "kappa", "delta", "white", "depth"), ...){
+rescale.phylo=function(x, model=c("BM", "OU", "EB", "nrate", "lrate", "trend",
+	"lambda", "kappa", "delta", "white", "depth"), ...){
 
 	phy=x
 
-	model=match.arg(model, c("BM", "OU", "EB", "nrate", "lrate", "trend", "lambda", "kappa", "delta", "white", "depth"))
+	model=match.arg(model, c("BM", "OU", "EB", "nrate", "lrate", "trend", "lambda",
+		"kappa", "delta", "white", "depth"))
 
 	if(!"phylo"%in%class(phy)) stop("supply 'phy' as a 'phylo' object")
 
@@ -1374,7 +1367,9 @@ rescale.phylo=function(x, model=c("BM", "OU", "EB", "nrate", "lrate", "trend", "
 	class(FUN)=c("transformer", "function")
 	dots=list(...)
 	if(!missing(...)) {
-        if(!all(names(dots)%in%argn(FUN))) stop(paste("The following parameters are expected:\n\t", paste(argn(FUN), collapse="\n\t", sep=""), sep=""))
+        if(!all(names(dots)%in%argn(FUN)))
+			stop(paste("The following parameters are expected:\n\t", paste(argn(FUN),
+				collapse="\n\t", sep=""), sep=""))
         return(FUN(...))
     } else {
     	return(FUN)
@@ -1564,7 +1559,6 @@ rescale.phylo=function(x, model=c("BM", "OU", "EB", "nrate", "lrate", "trend", "
 }
 
 
-
 # tree transformation
 .delta.cache=function(cache){
 	ht=.heights.cache(cache)
@@ -1599,6 +1593,8 @@ rescale.phylo=function(x, model=c("BM", "OU", "EB", "nrate", "lrate", "trend", "
 	ht$t=Tmax-ht$end
 	ht$e=ht$start-ht$end
 	ht$a=ht$t-ht$e
+	if(sum(ht$a < -0.1)>0) stop("Calculation error; contact developers.")
+	ht$a[ht$a<0] <- 0
 
 	z=function(delta, sigsq=1, rescale=TRUE){
 		if(delta<0) stop("'delta' must be positive valued")
@@ -1883,4 +1879,17 @@ drop.random<-function (phy, n)
     cut <- sample(1:nb.tip, n)
     r <- .drop.tip(phy, cut)
     return(r)
+}
+
+uniqueMultiPhylo=function(x, incomparables=FALSE, ...){
+	phy=x
+	if(incomparables) warning("'incomparables' exerts no effect in this setting")
+	ss=sapply(phy, digest)
+	if(any(dd<-duplicated(ss))){
+		sub=phy[-which(dd)]
+		class(sub)="multiPhylo"
+		return(sub)
+	} else {
+		return(phy)
+	}
 }
