@@ -109,7 +109,7 @@ Data are from the following sources:
 \itemize{
 		\item{data compiled by GJ Slater}
 		
-		\item{Paleobiology Database. 2011. \url{http://www.paleodb.org}.}
+		\item{Paleobiology Database. 2011. \url{https://paleobiodb.org/}.}
 }
 
 }

@@ -1871,7 +1871,7 @@ is.extinct <- function (phy, tol=NULL) {
 
 drop.random<-function (phy, n)
 {
-    if (class(phy) != "phylo")
+    if (!inherits(phy, "phylo"))
 	stop("object \"phy\" is not of class \"phylo\"")
     nb.tip <- length(phy$tip.label)
     if (n > nb.tip)
