@@ -1,7 +1,5 @@
 # Geiger
 
-[![Build Status](https://travis-ci.org/mwpennell/geiger-v2.svg?branch=master)](https://travis-ci.org/mwpennell/geiger-v2)
-
 ## Major features
 
 geiger is a (growing) collection of methods developed over the years by many researchers.
@@ -9,12 +7,12 @@ Here is a a non-comprehensive list of methods:
 
 * Fit continuous models of evolution (BM, OU, EB, Pagel models, etc.)
 * Fit discrete models of evolution (Mk and variants)
-* [Identify shifts in the rate of continuous trait evolution](https://onlinelibrary.wiley.com/doi/10.1111/j.1558-5646.2011.01401.x/abstract)
-* [Fit continuous trait models to unresolved data using ABC](https://onlinelibrary.wiley.com/doi/10.1111/j.1558-5646.2011.01474.x/abstract)
-* [Use fossil information to improve macroevolutionary inference](https://onlinelibrary.wiley.com/doi/10.1111/j.1558-5646.2012.01723.x/abstract)
-* [Identify shifts in the rate of diversification](https://www.pnas.org/doi/abs/10.1073/pnas.0811087106}
-* [Posterior predictive model assessment](http://sysbio.oxfordjournals.org/content/63/3/293)
-* [Time-scaling large phylogenies with 'congruification'](https://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12051/full)
+* Identify shifts in the rate of continuous trait evolution(doi:10.1111/j.1558-5646.2011.01401.x)
+* Fit continuous trait models to unresolved data using ABC(doi:10.1111/j.1558-5646.2011.01474.x)
+* Use fossil information to improve macroevolutionary inference(doi:10.1111/j.1558-5646.2012.01723.x)
+* Identify shifts in the rate of diversification(doi:10.1073/pnas.0811087106)
+* Posterior predictive model assessment(doi:10.1093/sysbio/syt066)
+* Time-scaling large phylogenies with 'congruification'(doi:10.1111/2041-210X.12051)
 
 ## Citing geiger
 
