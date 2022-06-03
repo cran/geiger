@@ -1,5 +1,5 @@
 dc3d3c5511f18b2a93a26fc536415a37 *ChangeLog
-4004914dfa7b98f02f94df23eba443dc *DESCRIPTION
+9fc1fbe1fdcdff6da8d61b59f38d3861 *DESCRIPTION
 706aec03c0fc4ea14377a8e913baabd1 *NAMESPACE
 97ee1e23e232abed865da6f20b76ba45 *R/TESTING.R
 a5b01bb0fe9bb6e326cf249303bdcad7 *R/congruify.R
@@ -22,7 +22,7 @@ d534def6ba625fdd1461ceaac70659c5 *R/postpred.R
 6f062849e52eb318836c9f0b7f60088c *R/simulation.R
 20934e22f6152a7f858d0c48736429e5 *R/traits-fossil.R
 bb2cb44a1690aaa7347a26175c585122 *R/traits.R
-5f8226a1c1b354bd0147cf9d79182176 *R/utilities-misc.R
+52f24cabe06886afec993267db7e0563 *R/utilities-misc.R
 8d133360d2964f7e42d8db90570f937c *R/utilities-phylo.R
 c176c34065968c42e2af4ab9acc9420c *R/utilities-print.R
 03d9fc67c81c4e6875db64acddbdf1d2 *R/utilities-stat.R
@@ -48,7 +48,7 @@ d60e958ea6562423da9df0ff7b6e53cc *man/dcount.Rd
 2d5d1e5182a9073c4b257b3677b07e8e *man/dtt.Rd
 910017f8f13414102a7199fed9324d32 *man/fitContinuous.Rd
 90697b3032b56d24b00583fddc8018a6 *man/fitContinuousMCMC.Rd
-27b70cbd65ae6b46d6c2307e5a83c0bf *man/fitDiscrete.Rd
+14b601f5ac6c27893d70a6635d3c85d8 *man/fitDiscrete.Rd
 fed1273c38767f031f4e4cef5ebd77fc *man/gbresolve.Rd
 207fa5819eb3d3088a3c508eeccbef7a *man/geiger-data.Rd
 61a5cf6235fd38b65746d999bf88c8b2 *man/geiger-defunct.Rd
