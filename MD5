@@ -1,6 +1,6 @@
 dc3d3c5511f18b2a93a26fc536415a37 *ChangeLog
-9fc1fbe1fdcdff6da8d61b59f38d3861 *DESCRIPTION
-706aec03c0fc4ea14377a8e913baabd1 *NAMESPACE
+18ce38654a1769a1fd746c329974ba89 *DESCRIPTION
+040640f3738a4feafba477eca01010df *NAMESPACE
 97ee1e23e232abed865da6f20b76ba45 *R/TESTING.R
 a5b01bb0fe9bb6e326cf249303bdcad7 *R/congruify.R
 0adc45b40b7e6146a61b1bad466fb71f *R/deprecated.R
@@ -22,9 +22,9 @@ d534def6ba625fdd1461ceaac70659c5 *R/postpred.R
 6f062849e52eb318836c9f0b7f60088c *R/simulation.R
 20934e22f6152a7f858d0c48736429e5 *R/traits-fossil.R
 bb2cb44a1690aaa7347a26175c585122 *R/traits.R
-52f24cabe06886afec993267db7e0563 *R/utilities-misc.R
-8d133360d2964f7e42d8db90570f937c *R/utilities-phylo.R
-c176c34065968c42e2af4ab9acc9420c *R/utilities-print.R
+5f8226a1c1b354bd0147cf9d79182176 *R/utilities-misc.R
+d7bb8ef06feb3c003032832e641fddcd *R/utilities-phylo.R
+bf90924a25765dc8fc68925f286b5055 *R/utilities-print.R
 03d9fc67c81c4e6875db64acddbdf1d2 *R/utilities-stat.R
 c0083a2fa1ff57a8c5a0d9a699f08951 *README.md
 b6adf6da014358fb49bf3f35d7f6d7d2 *data/amphibia.rda
@@ -35,7 +35,7 @@ e097f93f848b100c9128e81ee3844e7d *data/chelonia.rda
 20c2f2216156e00625b4517afb67c7c3 *data/geospiza.rda
 8090f0e0c32765a2f2f797507f424769 *data/primates.rda
 2310354d4fcc4919c578b51f5a63d539 *data/whales.rda
-7c36dba74cf223d6d6f1397c7c980c6e *inst/CITATION
+cf4837bdf07522726049d9825baef329 *inst/CITATION
 de97de23f552b48a08889b3e4830ac9a *man/aicm.Rd
 37958d30e5fc5955a4b2fd392de2c006 *man/aicw.Rd
 1ba4797f412f53c3544aded5535259bf *man/aov.phylo.Rd
@@ -51,7 +51,7 @@ d60e958ea6562423da9df0ff7b6e53cc *man/dcount.Rd
 14b601f5ac6c27893d70a6635d3c85d8 *man/fitDiscrete.Rd
 fed1273c38767f031f4e4cef5ebd77fc *man/gbresolve.Rd
 207fa5819eb3d3088a3c508eeccbef7a *man/geiger-data.Rd
-61a5cf6235fd38b65746d999bf88c8b2 *man/geiger-defunct.Rd
+244e988964e389893d03de383351fb4d *man/geiger-defunct.Rd
 47e10067b49fcab232d53b86d6301c86 *man/geiger-examples.Rd
 ecdce6f807fb87db5fa47ec5e86a0c68 *man/geiger-internal.Rd
 112f3f72878036051c8836c369452dfe *man/geiger-package.Rd
@@ -67,7 +67,7 @@ db65e2f5853a1d9f471bd162e3adb614 *man/plot.medusa.Rd
 910651b317eef53b42fbeb3463814713 *man/r8s.phylo.Rd
 3d53ceff4486496c1fbf112f0fd1fd0d *man/ratematrix.Rd
 78251fcd3e69c178800ef666ad7aa6c0 *man/rc.Rd
-6fb6b6ecac205a871bd9d9c1bd457d1d *man/rescale.Rd
+623224936e240f7a8b4df789d28847e8 *man/rescale.phylo.Rd
 3aa80b2866035e7a4500dcc0b5ef6404 *man/rjmcmc.bm.Rd
 93a7cdbd682069d1d4c927e25b3e41dd *man/sim.bd.Rd
 5041cdae06db04d616e2decf24cf71b6 *man/sim.bdtree.Rd
